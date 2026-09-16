@@ -337,7 +337,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXB_dlYNz_4R7KVQTu5YsL8JeT0rDLr0tKM-ZsuXsoLU_fwmYtkUKmmSttjEN6NZIebg/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlKoCgFaLzMt6pEVUT4CDNyGIjq-oxZMxmc-AXxhb3eLEqpwAaGPvQAU-r1uTU97oHAw/exec";
 
         let datosGlobales = { adminPass: "admin123", clientes: [] };
 
@@ -350,7 +350,7 @@
         function inicializarAcordeon() {
             let acc = document.getElementsByClassName("accordion");
             for (let i = 0; i < acc.length; i++) {
-                acc[i].removeEventListener("click", acordeonHandler); // Evitar duplicar listeners
+                acc[i].removeEventListener("click", acordeonHandler);
                 acc[i].addEventListener("click", acordeonHandler);
             }
         }
@@ -620,6 +620,8 @@
                 if(result.result === 'success') {
                     alert('¡Contraseña actualizada en la nube!');
                     datosGlobales.adminPass = nueva;
+                    document.getElementById('passActual').value = '';
+                    document.getElementById('passNueva').value = '';
                 }
             } catch(e) { alert('Error de red.'); }
         }
