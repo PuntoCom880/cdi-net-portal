@@ -337,7 +337,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwCvdOdF39y19BvqwkoSAc_L5ASaZDmtMHVTzPnRhUxY6c6sduvBolcjYb5OWC_0vZFQw/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzluXXqt9lVf1-LcQUiSrlFLXwx4_MiMKMqqmJ9ODGtGeEtpBCZyX_fYBXVHaoGdhXq1Q/exec";
 
         let datosGlobales = { clientes: [] };
 
@@ -640,9 +640,11 @@
                     return;
                 }
 
-                // 2. Si es correcta, enviamos la orden para cambiarla y guardarla en la celda A1 de Config
-                let urlCambio = `${WEB_APP_URL}?action=cambiarPassword&nuevaPassword=${encodeURIComponent(nueva)}`;
-                let res = await fetch(urlCambio);
+                // 2. Enviar la orden por POST para guardarla físicamente en la celda A1 de Config
+                let res = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'cambiarPassword', nuevaPassword: nueva })
+                });
                 let result = await res.json();
                 
                 if(result.result === 'success') {
