@@ -168,7 +168,7 @@
             <button onclick="verificarAdmin()">Panel Admin</button>
         </div>
 
-        <!-- SECCIÓN: PORTAL DEL CLIENTE (Privado e Individual Vertical) -->
+        <!-- SECCIÓN: PORTAL DEL CLIENTE -->
         <div id="portalCliente" class="section active-section">
             <h2>Portal de Consulta de Abonado</h2>
             <p style="text-align: center;">Ingrese su número de cédula para consultar el estatus de su cuenta:</p>
@@ -178,7 +178,7 @@
                 <button type="button" onclick="buscarClienteIndividual()" style="width: 100%;">Consultar Estatus</button>
             </div>
 
-            <!-- Contenedor donde se despliega la tarjeta vertical de resultados -->
+            <!-- Contenedor de resultados -->
             <div id="resultadoCliente"></div>
         </div>
 
@@ -212,6 +212,21 @@
         <div id="panelAdmin" class="section">
             <h2>Consola de Administración</h2>
             
+            <!-- Configurar Datos de Pago Móvil -->
+            <div style="background: rgba(0, 255, 204, 0.05); padding: 15px; border-radius: 6px; border: 1px solid #00ffcc; margin-bottom: 20px;">
+                <h3 style="color: #00ffcc; margin-top:0;">📱 Configurar Datos de Pago Móvil</h3>
+                <label>Banco:</label>
+                <input type="text" id="adminBanco" placeholder="Ej. Banesco (0134)">
+                
+                <label>Teléfono de Pago Móvil:</label>
+                <input type="text" id="adminTelPago" placeholder="Ej. 0414-1234567">
+                
+                <label>Cédula o RIF de Pago Móvil:</label>
+                <input type="text" id="adminCedulaPago" placeholder="Ej. V-12345678">
+                
+                <button type="button" onclick="guardarConfigPagoMovil()" style="width: 100%;">Guardar Datos de Pago Móvil</button>
+            </div>
+
             <!-- Cambiar Contraseña -->
             <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 6px; border: 1px solid #dc3545; margin-bottom: 20px;">
                 <h3 style="color: #ff6b6b; margin-top:0;">Seguridad: Cambiar Contraseña en la Nube</h3>
@@ -222,7 +237,7 @@
                 <button type="button" onclick="cambiarPasswordNube()" style="background: #dc3545; color: white;">Actualizar Contraseña en Google Sheets</button>
             </div>
 
-            <!-- Base de Datos de Clientes con Buscador y Eliminación -->
+            <!-- Base de Datos de Clientes -->
             <h3>Base de Datos de Clientes (Google Sheets)</h3>
             <div style="margin-bottom: 15px;">
                 <input type="text" id="buscadorAdmin" placeholder="🔍 Motor de búsqueda de clientes (filtrar por cédula o nombre)..." onkeyup="filtrarClientesAdmin()">
@@ -258,6 +273,7 @@
 
         window.onload = function() {
             cargarDatosRemotos();
+            cargarConfigPagoMovilEnInputs();
         };
 
         async function cargarDatosRemotos() {
@@ -276,6 +292,7 @@
             document.getElementById(id).classList.add('active-section');
             if(id === 'panelAdmin') {
                 renderizarTablaAdmin();
+                cargarConfigPagoMovilEnInputs();
             }
         }
 
@@ -288,7 +305,26 @@
             }
         }
 
-        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE (VERTICAL Y PRIVADA + PAGO MÓVIL) ---
+        // --- GESTIÓN LOCAL DE DATOS DE PAGO MÓVIL ---
+        function guardarConfigPagoMovil() {
+            let banco = document.getElementById('adminBanco').value;
+            let tel = document.getElementById('adminTelPago').value;
+            let ced = document.getElementById('adminCedulaPago').value;
+
+            localStorage.setItem('pm_banco', banco);
+            localStorage.setItem('pm_tel', tel);
+            localStorage.setItem('pm_ced', ced);
+
+            alert('¡Datos de Pago Móvil actualizados con éxito!');
+        }
+
+        function cargarConfigPagoMovilEnInputs() {
+            document.getElementById('adminBanco').value = localStorage.getItem('pm_banco') || 'Banesco (0134)';
+            document.getElementById('adminTelPago').value = localStorage.getItem('pm_tel') || '0414-XXXXXXX';
+            document.getElementById('adminCedulaPago').value = localStorage.getItem('pm_ced') || 'V-XXXXXXXX';
+        }
+
+        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE ---
         function buscarClienteIndividual() {
             let cedulaInput = document.getElementById('buscadorCedula').value.trim();
             let contenedor = document.getElementById('resultadoCliente');
@@ -308,7 +344,11 @@
 
             let colorEstatus = clienteEncontrado.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b';
 
-            // Tarjeta vertical con datos del cliente + sección clara de Pago Móvil
+            // Obtener los datos configurados por el admin
+            let bancoConfig = localStorage.getItem('pm_banco') || 'Banesco (0134)';
+            let telConfig = localStorage.getItem('pm_tel') || '0414-XXXXXXX';
+            let cedConfig = localStorage.getItem('pm_ced') || 'V-XXXXXXXX';
+
             contenedor.innerHTML = `
                 <div class="card-cliente">
                     <h3 style="margin-top: 0; color: #00ffcc; text-align: center; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 10px;">📋 Detalle de Cuenta</h3>
@@ -337,20 +377,20 @@
                         <span class="info-value" style="color: ${colorEstatus};">${clienteEncontrado.estatusPago}</span>
                     </div>
 
-                    <!-- Datos para realizar el Pago Móvil -->
+                    <!-- Datos de Pago Móvil Dinámicos -->
                     <div class="pago-movil-box">
                         <h4 style="margin-top: 0; color: #00ffcc; text-align: center;">📱 Datos para Pago Móvil</h4>
                         <div class="info-row" style="padding: 6px 0;">
                             <span class="info-label">Banco:</span>
-                            <span class="info-value">Banesco (0134) / (Coloca tu banco)</span>
+                            <span class="info-value">${bancoConfig}</span>
                         </div>
                         <div class="info-row" style="padding: 6px 0;">
                             <span class="info-label">Teléfono:</span>
-                            <span class="info-value">0414-XXXXXXX (Tu número)</span>
+                            <span class="info-value">${telConfig}</span>
                         </div>
                         <div class="info-row" style="padding: 6px 0; border-bottom: none;">
                             <span class="info-label">Cédula / RIF:</span>
-                            <span class="info-value">V-XXXXXXXX (Tu cédula o rif)</span>
+                            <span class="info-value">${cedConfig}</span>
                         </div>
                     </div>
 
