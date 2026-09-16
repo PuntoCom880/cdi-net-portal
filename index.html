@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDI_NET // NOC & BILLING CONTROL</title>
     <style>
-        /* Fondo animado de red global */
         #bg-network {
             position: fixed;
             top: 0;
@@ -27,7 +26,7 @@
         .container {
             position: relative;
             z-index: 1;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             background: rgba(15, 23, 42, 0.85);
             padding: 30px;
@@ -57,11 +56,23 @@
             border-radius: 6px;
             cursor: pointer;
             transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
         }
 
-        button:hover {
+        button:hover, .btn:hover {
             background: #00b38f;
             box-shadow: 0 0 10px #00ffcc;
+        }
+
+        .btn-whatsapp {
+            background: #25d366;
+            color: white;
+        }
+        .btn-whatsapp:hover {
+            background: #1ebe5d;
+            box-shadow: 0 0 10px #25d366;
         }
 
         .btn-danger {
@@ -110,7 +121,52 @@
             display: block;
         }
 
-        /* Estilo vertical estético para el perfil del cliente */
+        /* Estilos de Acordeón Desplegable Profesional */
+        .accordion {
+            background: #1e293b;
+            color: #00ffcc;
+            cursor: pointer;
+            padding: 15px 20px;
+            width: 100%;
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion:hover {
+            background: rgba(0, 255, 204, 0.1);
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+
+        .accordion::after {
+            content: '\002B';
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .accordion.active::after {
+            content: "\2212";
+        }
+
+        .panel-content {
+            padding: 0 18px;
+            background: rgba(30, 41, 59, 0.4);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-radius: 0 0 8px 8px;
+            margin-bottom: 15px;
+            border: 1px solid transparent;
+        }
+
         .card-cliente {
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(0, 255, 204, 0.3);
@@ -142,7 +198,6 @@
             text-align: right;
         }
 
-        /* Tarjeta de pago móvil integrada */
         .pago-movil-box {
             background: rgba(0, 255, 204, 0.05);
             border: 1px dashed #00ffcc;
@@ -154,21 +209,19 @@
 </head>
 <body>
 
-    <!-- Fondo dinámico de red -->
     <canvas id="bg-network"></canvas>
 
     <div class="container">
         <h1>[CDI_NET] // NOC & BILLING CONTROL</h1>
         <p style="text-align: center; color: #94a3b8;">Sistema automatizado de gestión de abonados y pasarela de pagos</p>
 
-        <!-- Botones de Navegación -->
         <div class="nav-buttons">
             <button onclick="mostrarSeccion('portalCliente')">Portal del Cliente</button>
             <button onclick="mostrarSeccion('registroNuevo')">Registro Nuevo</button>
             <button onclick="verificarAdmin()">Panel Admin</button>
         </div>
 
-        <!-- SECCIÓN: PORTAL DEL CLIENTE -->
+        <!-- PORTAL DEL CLIENTE -->
         <div id="portalCliente" class="section active-section">
             <h2>Portal de Consulta de Abonado</h2>
             <p style="text-align: center;">Ingrese su número de cédula para consultar el estatus de su cuenta:</p>
@@ -178,11 +231,10 @@
                 <button type="button" onclick="buscarClienteIndividual()" style="width: 100%;">Consultar Estatus</button>
             </div>
 
-            <!-- Contenedor de resultados -->
             <div id="resultadoCliente"></div>
         </div>
 
-        <!-- SECCIÓN: REGISTRO NUEVO -->
+        <!-- REGISTRO NUEVO -->
         <div id="registroNuevo" class="section">
             <h2>Registro de Nuevo Abonado</h2>
             <form id="formRegistro" onsubmit="registrarCliente(event)">
@@ -208,39 +260,60 @@
             </form>
         </div>
 
-        <!-- SECCIÓN: PANEL ADMIN -->
+        <!-- PANEL ADMIN -->
         <div id="panelAdmin" class="section">
             <h2>Consola de Administración</h2>
             
-            <!-- Configurar Datos de Pago Móvil -->
-            <div style="background: rgba(0, 255, 204, 0.05); padding: 15px; border-radius: 6px; border: 1px solid #00ffcc; margin-bottom: 20px;">
-                <h3 style="color: #00ffcc; margin-top:0;">📱 Configurar Datos de Pago Móvil</h3>
-                <label>Banco:</label>
-                <input type="text" id="adminBanco" placeholder="Ej. Banesco (0134)">
-                
-                <label>Teléfono de Pago Móvil:</label>
-                <input type="text" id="adminTelPago" placeholder="Ej. 0414-1234567">
-                
-                <label>Cédula o RIF de Pago Móvil:</label>
-                <input type="text" id="adminCedulaPago" placeholder="Ej. V-12345678">
-                
-                <button type="button" onclick="guardarConfigPagoMovil()" style="width: 100%;">Guardar Datos de Pago Móvil</button>
+            <!-- ACORDEÓN 1: PAGO MÓVIL Y WHATSAPP -->
+            <button class="accordion">📱 Configurar Datos de Pago Móvil y WhatsApp</button>
+            <div class="panel-content">
+                <div style="padding-top: 15px;">
+                    <label>Banco:</label>
+                    <input type="text" id="adminBanco" placeholder="Ej. Banesco (0134)">
+                    
+                    <label>Teléfono de Pago Móvil:</label>
+                    <input type="text" id="adminTelPago" placeholder="Ej. 0414-1234567">
+                    
+                    <label>Cédula o RIF de Pago Móvil:</label>
+                    <input type="text" id="adminCedulaPago" placeholder="Ej. V-12345678">
+                    
+                    <label>Número de WhatsApp para reportes (Ej: 584141234567):</label>
+                    <input type="text" id="adminWhatsAppNum" placeholder="Ej. 584141234567">
+                    
+                    <button type="button" onclick="guardarConfigPagoMovil()" style="width: 100%; margin-bottom: 15px;">Guardar Cambios de Pago</button>
+                </div>
             </div>
 
-            <!-- Cambiar Contraseña -->
-            <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 6px; border: 1px solid #dc3545; margin-bottom: 20px;">
-                <h3 style="color: #ff6b6b; margin-top:0;">Seguridad: Cambiar Contraseña en la Nube</h3>
-                <label>Contraseña Actual:</label>
-                <input type="password" id="passActual">
-                <label>Nueva Contraseña:</label>
-                <input type="password" id="passNueva">
-                <button type="button" onclick="cambiarPasswordNube()" style="background: #dc3545; color: white;">Actualizar Contraseña en Google Sheets</button>
+            <!-- ACORDEÓN 2: TASA Y MENSUALIDAD -->
+            <button class="accordion">💵 Fijar Tasa del Dólar y Costo Mensual</button>
+            <div class="panel-content">
+                <div style="padding-top: 15px;">
+                    <label>Tasa del Dólar (Bs por $):</label>
+                    <input type="number" step="0.01" id="adminTasaDolar" placeholder="Ej. 36.50">
+                    
+                    <label>Costo de la Mensualidad ($):</label>
+                    <input type="number" step="0.01" id="adminCostoPlan" placeholder="Ej. 15.00">
+                    
+                    <button type="button" onclick="guardarTasaYPlan()" style="width: 100%; margin-bottom: 15px;">Guardar Tasa y Tarifa</button>
+                </div>
             </div>
 
-            <!-- Base de Datos de Clientes -->
+            <!-- ACORDEÓN 3: SEGURIDAD -->
+            <button class="accordion">🔒 Seguridad: Cambiar Contraseña Admin</button>
+            <div class="panel-content">
+                <div style="padding-top: 15px;">
+                    <label>Contraseña Actual:</label>
+                    <input type="password" id="passActual">
+                    <label>Nueva Contraseña:</label>
+                    <input type="password" id="passNueva">
+                    <button type="button" onclick="cambiarPasswordNube()" style="background: #dc3545; color: white; width: 100%; margin-bottom: 15px;">Actualizar Contraseña</button>
+                </div>
+            </div>
+
+            <br>
             <h3>Base de Datos de Clientes (Google Sheets)</h3>
             <div style="margin-bottom: 15px;">
-                <input type="text" id="buscadorAdmin" placeholder="🔍 Motor de búsqueda de clientes (filtrar por cédula o nombre)..." onkeyup="filtrarClientesAdmin()">
+                <input type="text" id="buscadorAdmin" placeholder="🔍 Motor de búsqueda de clientes..." onkeyup="filtrarClientesAdmin()">
             </div>
             
             <div style="overflow-x: auto;">
@@ -257,24 +330,39 @@
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="tbodyAdmin">
-                        <!-- Cargado dinámicamente -->
-                    </tbody>
+                    <tbody id="tbodyAdmin"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Script principal de lógica y animación -->
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz47HbcisPjyr_hZQ9rNXlMEE9poLpFTq4Vl4R1MctdQGwLrJhnsg3VKB7b6scWFmcafA/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXB_dlYNz_4R7KVQTu5YsL8JeT0rDLr0tKM-ZsuXsoLU_fwmYtkUKmmSttjEN6NZIebg/exec";
 
         let datosGlobales = { adminPass: "admin123", clientes: [] };
 
         window.onload = function() {
             cargarDatosRemotos();
             cargarConfigPagoMovilEnInputs();
+            inicializarAcordeon();
         };
+
+        function inicializarAcordeon() {
+            let acc = document.getElementsByClassName("accordion");
+            for (let i = 0; i < acc.length; i++) {
+                acc[i].addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    let panel = this.nextElementSibling;
+                    if (panel.style.maxHeight) {
+                        panel.style.maxHeight = null;
+                        panel.style.border = "1px solid transparent";
+                    } else {
+                        panel.style.maxHeight = panel.scrollHeight + "px";
+                        panel.style.border = "1px solid rgba(0, 255, 204, 0.2)";
+                    }
+                });
+            }
+        }
 
         async function cargarDatosRemotos() {
             try {
@@ -293,6 +381,7 @@
             if(id === 'panelAdmin') {
                 renderizarTablaAdmin();
                 cargarConfigPagoMovilEnInputs();
+                setTimeout(inicializarAcordeon, 100);
             }
         }
 
@@ -305,26 +394,29 @@
             }
         }
 
-        // --- GESTIÓN LOCAL DE DATOS DE PAGO MÓVIL ---
         function guardarConfigPagoMovil() {
-            let banco = document.getElementById('adminBanco').value;
-            let tel = document.getElementById('adminTelPago').value;
-            let ced = document.getElementById('adminCedulaPago').value;
+            localStorage.setItem('pm_banco', document.getElementById('adminBanco').value);
+            localStorage.setItem('pm_tel', document.getElementById('adminTelPago').value);
+            localStorage.setItem('pm_ced', document.getElementById('adminCedulaPago').value);
+            localStorage.setItem('pm_wa', document.getElementById('adminWhatsAppNum').value);
+            alert('¡Datos de Pago Móvil y WhatsApp actualizados!');
+        }
 
-            localStorage.setItem('pm_banco', banco);
-            localStorage.setItem('pm_tel', tel);
-            localStorage.setItem('pm_ced', ced);
-
-            alert('¡Datos de Pago Móvil actualizados con éxito!');
+        function guardarTasaYPlan() {
+            localStorage.setItem('tasa_dolar', document.getElementById('adminTasaDolar').value);
+            localStorage.setItem('costo_plan', document.getElementById('adminCostoPlan').value);
+            alert('¡Tasa y costo de mensualidad guardados correctamente!');
         }
 
         function cargarConfigPagoMovilEnInputs() {
             document.getElementById('adminBanco').value = localStorage.getItem('pm_banco') || 'Banesco (0134)';
             document.getElementById('adminTelPago').value = localStorage.getItem('pm_tel') || '0414-XXXXXXX';
             document.getElementById('adminCedulaPago').value = localStorage.getItem('pm_ced') || 'V-XXXXXXXX';
+            document.getElementById('adminWhatsAppNum').value = localStorage.getItem('pm_wa') || '';
+            document.getElementById('adminTasaDolar').value = localStorage.getItem('tasa_dolar') || '36.50';
+            document.getElementById('adminCostoPlan').value = localStorage.getItem('costo_plan') || '15.00';
         }
 
-        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE ---
         function buscarClienteIndividual() {
             let cedulaInput = document.getElementById('buscadorCedula').value.trim();
             let contenedor = document.getElementById('resultadoCliente');
@@ -342,12 +434,18 @@
                 return;
             }
 
-            let colorEstatus = clienteEncontrado.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b';
-
-            // Obtener los datos configurados por el admin
+            let colorEstatus = clienteEncontrado.estatusPago === 'Activo' ? '#00ffcc' : (clienteEncontrado.estatusPago === 'Pendiente' ? '#ffcc00' : '#ff6b6b');
             let bancoConfig = localStorage.getItem('pm_banco') || 'Banesco (0134)';
             let telConfig = localStorage.getItem('pm_tel') || '0414-XXXXXXX';
             let cedConfig = localStorage.getItem('pm_ced') || 'V-XXXXXXXX';
+            let waNum = localStorage.getItem('pm_wa') || '';
+            let tasaDolar = parseFloat(localStorage.getItem('tasa_dolar') || '36.50');
+            let costoPlanDolar = parseFloat(localStorage.getItem('costo_plan') || '15.00');
+            let costoPlanBs = (costoPlanDolar * tasaDolar).toFixed(2);
+
+            let mensajeWa = `Hola, reporto mi pago de internet.%0A*Cliente:* ${encodeURIComponent(clienteEncontrado.nombres + ' ' + clienteEncontrado.apellidos)}%0A*Cédula:* ${clienteEncontrado.cedula}%0A*Factura:* ${clienteEncontrado.factura}%0A*Monto Abono:* ${clienteEncontrado.abonoBs} Bs`;
+            let linkWa = waNum ? `https://wa.me/${waNum}?text=${mensajeWa}` : `https://wa.me/?text=${mensajeWa}`;
+            let facturaMostrar = clienteEncontrado.factura && clienteEncontrado.factura !== "" ? clienteEncontrado.factura : "FAC-" + clienteEncontrado.cedula;
 
             contenedor.innerHTML = `
                 <div class="card-cliente">
@@ -361,12 +459,12 @@
                         <span class="info-value">${clienteEncontrado.nombres} ${clienteEncontrado.apellidos}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Teléfono:</span>
-                        <span class="info-value">${clienteEncontrado.telefono}</span>
+                        <span class="info-label">N° Factura:</span>
+                        <span class="info-value" style="color: #00ffcc;">${facturaMostrar}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Día de Pago:</span>
-                        <span class="info-value">${clienteEncontrado.diaPago}</span>
+                        <span class="info-label">Costo Mensualidad:</span>
+                        <span class="info-value">$${costoPlanDolar} (${costoPlanBs} Bs)</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Abono Bs:</span>
@@ -377,7 +475,6 @@
                         <span class="info-value" style="color: ${colorEstatus};">${clienteEncontrado.estatusPago}</span>
                     </div>
 
-                    <!-- Datos de Pago Móvil Dinámicos -->
                     <div class="pago-movil-box">
                         <h4 style="margin-top: 0; color: #00ffcc; text-align: center;">📱 Datos para Pago Móvil</h4>
                         <div class="info-row" style="padding: 6px 0;">
@@ -395,7 +492,7 @@
                     </div>
 
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="https://wa.me/?text=Hola,%20reporto%20mi%20pago%20de%20internet%20a%20nombre%20de%20${encodeURIComponent(clienteEncontrado.nombres + ' ' + clienteEncontrado.apellidos)}%20Cédula:%20${clienteEncontrado.cedula}" target="_blank" class="btn" style="text-decoration: none; display: inline-block;">
+                        <a href="${linkWa}" target="_blank" class="btn btn-whatsapp">
                             💬 Reportar Pago por WhatsApp
                         </a>
                     </div>
@@ -407,15 +504,23 @@
             let tbodyAdmin = document.getElementById('tbodyAdmin');
             tbodyAdmin.innerHTML = '';
             datosGlobales.clientes.forEach(c => {
+                let facVal = c.factura && c.factura !== "" ? c.factura : "FAC-" + c.cedula;
+                let estatusActual = c.estatusPago || 'Activo';
                 tbodyAdmin.innerHTML += `
                     <tr>
                         <td>${c.cedula}</td>
                         <td>${c.nombres} ${c.apellidos}</td>
                         <td>${c.telefono}</td>
                         <td>${c.diaPago}</td>
-                        <td><input type="number" value="${c.abonoBs}" style="width:80px; margin:0;" id="abono_${c.cedula}"></td>
-                        <td>${c.factura}</td>
-                        <td><span style="color: ${c.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b'}">${c.estatusPago}</span></td>
+                        <td><input type="number" value="${c.abonoBs}" style="width:75px; margin:0;" id="abono_${c.cedula}"></td>
+                        <td><input type="text" value="${facVal}" style="width:90px; margin:0;" id="factura_${c.cedula}"></td>
+                        <td>
+                            <select id="estatus_${c.cedula}" style="width:110px; margin:0; padding:6px; font-size:14px;">
+                                <option value="Activo" ${estatusActual === 'Activo' ? 'selected' : ''}>Activo</option>
+                                <option value="Pendiente" ${estatusActual === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                                <option value="Cortado" ${estatusActual === 'Cortado' ? 'selected' : ''}>Cortado</option>
+                            </select>
+                        </td>
                         <td>
                             <button onclick="guardarAbono('${c.cedula}')" style="padding: 5px 10px; font-size: 12px;">OK</button>
                             <button onclick="eliminarClienteNube('${c.cedula}')" class="btn-danger" style="padding: 5px 10px; font-size: 12px; margin-top:5px;">Eliminar</button>
@@ -427,24 +532,23 @@
 
         function filtrarClientesAdmin() {
             let filtro = document.getElementById('buscadorAdmin').value.toLowerCase();
-            let filas = document.querySelectorAll('#tbodyAdmin tr');
-            filas.forEach(fila => {
-                let texto = fila.textContent.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? '' : 'none';
+            document.querySelectorAll('#tbodyAdmin tr').forEach(fila => {
+                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? '' : 'none';
             });
         }
 
-        // --- ACCIONES CON GOOGLE SHEETS ---
         async function registrarCliente(event) {
             event.preventDefault();
+            let cedula = document.getElementById('regCedula').value;
             let nuevo = {
                 action: 'registrar',
-                cedula: document.getElementById('regCedula').value,
+                cedula: cedula,
                 nombres: document.getElementById('regNombres').value,
                 apellidos: document.getElementById('regApellidos').value,
                 telefono: document.getElementById('regTelefono').value,
                 correo: document.getElementById('regCorreo').value,
-                diaPago: document.getElementById('regDiaPago').value
+                diaPago: document.getElementById('regDiaPago').value,
+                factura: "FAC-" + cedula
             };
 
             alert('Registrando en Google Sheets...');
@@ -464,25 +568,26 @@
 
         async function guardarAbono(cedula) {
             let abono = document.getElementById(`abono_${cedula}`).value;
+            let factura = document.getElementById(`factura_${cedula}`).value;
+            let estatus = document.getElementById(`estatus_${cedula}`).value;
             try {
                 let res = await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ action: 'actualizarAbono', cedula: cedula, abonoBs: abono })
+                    body: JSON.stringify({ action: 'actualizarAbono', cedula: cedula, abonoBs: abono, factura: factura, estatusPago: estatus })
                 });
                 let result = await res.json();
                 if(result.result === 'success') {
-                    alert('¡Abono actualizado con éxito!');
+                    alert('¡Datos de pago y estatus actualizados con éxito!');
                     await cargarDatosRemotos();
                     renderizarTablaAdmin();
                 }
             } catch(e) {
-                alert('Error de red al actualizar abono.');
+                alert('Error de red al actualizar.');
             }
         }
 
         async function eliminarClienteNube(cedula) {
-            if (!confirm(`¿Estás seguro de eliminar al cliente con cédula ${cedula}? Se borrará permanentemente de Google Sheets.`)) return;
-
+            if (!confirm(`¿Eliminar al cliente con cédula ${cedula}?`)) return;
             try {
                 let res = await fetch(WEB_APP_URL, {
                     method: 'POST',
@@ -490,30 +595,19 @@
                 });
                 let result = await res.json();
                 if(result.result === 'success') {
-                    alert('¡Cliente eliminado de Google Sheets!');
+                    alert('¡Eliminado con éxito!');
                     await cargarDatosRemotos();
                     renderizarTablaAdmin();
-                } else {
-                    alert('No se pudo eliminar el cliente.');
                 }
             } catch(e) {
-                alert('Error de red al intentar eliminar.');
+                alert('Error de red.');
             }
         }
 
         async function cambiarPasswordNube() {
             let actual = document.getElementById('passActual').value;
             let nueva = document.getElementById('passNueva').value;
-
-            if(actual !== datosGlobales.adminPass) {
-                alert('La contraseña actual es incorrecta.');
-                return;
-            }
-            if(!nueva || nueva.length < 4) {
-                alert('La nueva contraseña debe tener al menos 4 caracteres.');
-                return;
-            }
-
+            if(actual !== datosGlobales.adminPass) { alert('Contraseña actual incorrecta.'); return; }
             try {
                 let res = await fetch(WEB_APP_URL, {
                     method: 'POST',
@@ -521,65 +615,37 @@
                 });
                 let result = await res.json();
                 if(result.result === 'success') {
-                    alert('¡Contraseña de administrador actualizada en la nube!');
+                    alert('¡Contraseña actualizada en la nube!');
                     datosGlobales.adminPass = nueva;
-                    document.getElementById('passActual').value = '';
-                    document.getElementById('passNueva').value = '';
                 }
-            } catch(e) {
-                alert('Error de red al cambiar la contraseña.');
-            }
+            } catch(e) { alert('Error de red.'); }
         }
 
-        // --- ANIMACIÓN DE REDES EN EL FONDO ---
         const canvas = document.getElementById('bg-network');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
         let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
+        window.addEventListener('resize', () => { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; });
         const particles = [];
-        const numParticles = Math.floor(width / 35);
-        for (let i = 0; i < numParticles; i++) {
-            particles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                radius: Math.random() * 2 + 1
-            });
+        for (let i = 0; i < Math.floor(width / 35); i++) {
+            particles.push({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8, radius: Math.random() * 2 + 1 });
         }
-
         function animateNetwork() {
             ctx.clearRect(0, 0, width, height);
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
-                    let dx = particles[i].x - particles[j].x;
-                    let dy = particles[i].y - particles[j].y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    let dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y, dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(0, 255, 204, ${1 - dist / 120})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 255, 204, ${1 - dist / 120})`; ctx.lineWidth = 0.5; ctx.stroke();
                     }
                 }
             }
             for (let p of particles) {
-                p.x += p.vx;
-                p.y += p.vy;
+                p.x += p.vx; p.y += p.vy;
                 if (p.x < 0 || p.x > width) p.vx *= -1;
                 if (p.y < 0 || p.y > height) p.vy *= -1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#00ffcc';
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = '#00ffcc'; ctx.fill();
             }
             requestAnimationFrame(animateNetwork);
         }
