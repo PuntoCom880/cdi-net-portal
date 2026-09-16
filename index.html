@@ -350,17 +350,20 @@
         function inicializarAcordeon() {
             let acc = document.getElementsByClassName("accordion");
             for (let i = 0; i < acc.length; i++) {
-                acc[i].addEventListener("click", function() {
-                    this.classList.toggle("active");
-                    let panel = this.nextElementSibling;
-                    if (panel.style.maxHeight) {
-                        panel.style.maxHeight = null;
-                        panel.style.border = "1px solid transparent";
-                    } else {
-                        panel.style.maxHeight = panel.scrollHeight + "px";
-                        panel.style.border = "1px solid rgba(0, 255, 204, 0.2)";
-                    }
-                });
+                acc[i].removeEventListener("click", acordeonHandler); // Evitar duplicar listeners
+                acc[i].addEventListener("click", acordeonHandler);
+            }
+        }
+
+        function acordeonHandler() {
+            this.classList.toggle("active");
+            let panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+                panel.style.border = "1px solid transparent";
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+                panel.style.border = "1px solid rgba(0, 255, 204, 0.2)";
             }
         }
 
@@ -381,7 +384,7 @@
             if(id === 'panelAdmin') {
                 renderizarTablaAdmin();
                 cargarConfigPagoMovilEnInputs();
-                setTimeout(inicializarAcordeon, 100);
+                setTimeout(inicializarAcordeon, 50);
             }
         }
 
