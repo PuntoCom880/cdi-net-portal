@@ -141,6 +141,15 @@
             font-weight: bold;
             text-align: right;
         }
+
+        /* Tarjeta de pago móvil integrada */
+        .pago-movil-box {
+            background: rgba(0, 255, 204, 0.05);
+            border: 1px dashed #00ffcc;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -279,7 +288,7 @@
             }
         }
 
-        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE (VERTICAL Y PRIVADA) ---
+        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE (VERTICAL Y PRIVADA + PAGO MÓVIL) ---
         function buscarClienteIndividual() {
             let cedulaInput = document.getElementById('buscadorCedula').value.trim();
             let contenedor = document.getElementById('resultadoCliente');
@@ -290,7 +299,6 @@
                 return;
             }
 
-            // Buscar en el arreglo global de clientes
             let clienteEncontrado = datosGlobales.clientes.find(c => String(c.cedula).trim() === cedulaInput);
 
             if (!clienteEncontrado) {
@@ -300,7 +308,7 @@
 
             let colorEstatus = clienteEncontrado.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b';
 
-            // Generar tarjeta vertical estética
+            // Tarjeta vertical con datos del cliente + sección clara de Pago Móvil
             contenedor.innerHTML = `
                 <div class="card-cliente">
                     <h3 style="margin-top: 0; color: #00ffcc; text-align: center; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 10px;">📋 Detalle de Cuenta</h3>
@@ -327,6 +335,29 @@
                     <div class="info-row">
                         <span class="info-label">Estatus:</span>
                         <span class="info-value" style="color: ${colorEstatus};">${clienteEncontrado.estatusPago}</span>
+                    </div>
+
+                    <!-- Datos para realizar el Pago Móvil -->
+                    <div class="pago-movil-box">
+                        <h4 style="margin-top: 0; color: #00ffcc; text-align: center;">📱 Datos para Pago Móvil</h4>
+                        <div class="info-row" style="padding: 6px 0;">
+                            <span class="info-label">Banco:</span>
+                            <span class="info-value">Banesco (0134) / (Coloca tu banco)</span>
+                        </div>
+                        <div class="info-row" style="padding: 6px 0;">
+                            <span class="info-label">Teléfono:</span>
+                            <span class="info-value">0414-XXXXXXX (Tu número)</span>
+                        </div>
+                        <div class="info-row" style="padding: 6px 0; border-bottom: none;">
+                            <span class="info-label">Cédula / RIF:</span>
+                            <span class="info-value">V-XXXXXXXX (Tu cédula o rif)</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="https://wa.me/?text=Hola,%20reporto%20mi%20pago%20de%20internet%20a%20nombre%20de%20${encodeURIComponent(clienteEncontrado.nombres + ' ' + clienteEncontrado.apellidos)}%20Cédula:%20${clienteEncontrado.cedula}" target="_blank" class="btn" style="text-decoration: none; display: inline-block;">
+                            💬 Reportar Pago por WhatsApp
+                        </a>
                     </div>
                 </div>
             `;
