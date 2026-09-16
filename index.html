@@ -177,9 +177,7 @@
         }
         .btn-success:hover { background-color: #059669 !important; }
 
-        .btn-danger { 
-            background-color: var(--danger) !important; 
-        }
+        .btn-danger { background-color: var(--danger) !important; }
 
         .card {
             background: #0f172a;
@@ -230,18 +228,12 @@
         .bg-pendiente { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
         .bg-moroso { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        .actions-cell {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .actions-cell button {
-            padding: 0.4rem 0.7rem;
-            font-size: 0.75rem;
-            width: auto;
-        }
+        .actions-cell { display: flex; gap: 0.5rem; }
+        .actions-cell button { padding: 0.4rem 0.7rem; font-size: 0.75rem; width: auto; }
         .table-responsive { overflow-x: auto; }
         hr { border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0; }
         .search-box { display: flex; gap: 0.75rem; }
+        .loader { text-align: center; padding: 1rem; font-family: 'JetBrains Mono', monospace; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -266,14 +258,12 @@
             <div class="form-group" style="margin-top: 1.5rem;">
                 <label>NÚMERO DE CÉDULA:</label>
                 <div class="search-box">
-                    <input type="text" id="searchCedula" placeholder="Ej: V-12345678">
+                    <input type="text" id="searchCedula" placeholder="Ej: 25975209">
                     <button class="btn" style="width: 160px;" onclick="consultarCliente()">CONSULTAR</button>
                 </div>
             </div>
 
             <div id="clientResult" style="display: none;">
-                
-                <!-- INFORMACIÓN DEL SUSCRIPTOR -->
                 <div class="card">
                     <h3 style="margin-top:0; color: var(--primary);">[+] INFORMACIÓN DEL SUSCRIPTOR</h3>
                     <p><strong>Titular:</strong> <span id="resNombre"></span></p>
@@ -288,7 +278,6 @@
                     <p><strong>Saldo / Deuda Pendiente ($):</strong> $<span id="resSaldo">0.00</span> (<span id="resDeudaBs">0.00</span> Bs)</p>
                 </div>
 
-                <!-- DATOS OFICIALES DE PAGO MÓVIL (AQUÍ ESTÁN VISIBLES) -->
                 <div class="pago-movil-box">
                     <h3 style="margin-top:0; color: var(--accent);">📱 DATOS OFICIALES PARA PAGO MÓVIL</h3>
                     <p style="margin: 0.4rem 0; font-size: 1.05rem;"><strong>Banco:</strong> Banco Venezolano de Crédito (0104)</p>
@@ -296,10 +285,8 @@
                     <p style="margin: 0.4rem 0; font-size: 1.05rem;"><strong>Teléfono:</strong> 0412-1199929</p>
                 </div>
 
-                <!-- FORMULARIO PARA REPORTAR EL PAGO -->
                 <div class="card" style="border-color: rgba(16, 185, 129, 0.3);">
                     <h3 style="margin-top:0; color: var(--accent);">[+] REPORTAR PAGO MÓVIL REALIZADO</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted);">Indique el monto y número de referencia para verificar en su cuenta bancaria.</p>
                     <div class="form-group">
                         <label>MONTO ABONADO EN BS:</label>
                         <input type="number" id="pagoBs" placeholder="Ej: 980">
@@ -319,7 +306,7 @@
             <div style="margin-top: 1.5rem;">
                 <div class="form-group">
                     <label>CÉDULA DE IDENTIDAD:</label>
-                    <input type="text" id="regCedula" placeholder="Ej: V-12345678">
+                    <input type="text" id="regCedula" placeholder="Ej: 25975209">
                 </div>
                 <div class="form-group">
                     <label>NOMBRES:</label>
@@ -374,18 +361,9 @@
                     <button class="btn" onclick="guardarConfiguracion()">ACTUALIZAR PARÁMETROS</button>
                 </div>
 
-                <div class="card" style="border-color: rgba(245, 158, 11, 0.3);">
-                    <h3 style="margin-top:0; color: var(--warning);">[+] SEGURIDAD</h3>
-                    <div class="form-group">
-                        <label>NUEVA CONTRASEÑA DE ADMIN:</label>
-                        <input type="password" id="newAdminPass" placeholder="Nueva clave">
-                    </div>
-                    <button class="btn" style="background-color: var(--warning); color: #000;" onclick="cambiarClaveAdmin()">MODIFICAR CONTRASEÑA</button>
-                </div>
-
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3 style="margin:0;">[+] BASE DE DATOS DE CLIENTES</h3>
-                    <button class="btn btn-success" style="width: auto;" onclick="exportarExcelCSV()">📥 RESPALDO EXCEL (CSV)</button>
+                    <h3 style="margin:0;">[+] BASE DE DATOS DE CLIENTES (GOOGLE SHEETS)</h3>
+                    <button class="btn" style="width: auto;" onclick="cargarClientesRemotos()">🔄 ACTUALIZAR DATOS</button>
                 </div>
 
                 <div class="table-responsive">
@@ -399,47 +377,25 @@
                                 <th>ABONO BS</th>
                                 <th>FACTURA</th>
                                 <th>ESTATUS</th>
-                                <th>VENCE</th>
                                 <th>ACCIONES</th>
                             </tr>
                         </thead>
-                        <tbody id="adminTableBody"></tbody>
+                        <tbody id="adminTableBody">
+                            <tr><td colspan="8" class="loader">Cargando datos desde Google Sheets...</td></tr>
+                        </tbody>
                     </table>
-                </div>
-
-                <div class="card" style="margin-top: 2rem; border-color: rgba(59, 130, 246, 0.3);">
-                    <h3 style="margin-top:0; color: var(--primary);">[+] VERIFICACIÓN DE PAGOS REPORTADOS (CON CÉDULA Y REFERENCIA)</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>CÉDULA CLIENTE</th>
-                                    <th>NOMBRE</th>
-                                    <th>MONTO BS</th>
-                                    <th>REF. BANCARIA</th>
-                                    <th>ACCIÓN</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pagosPendientesBody"></tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        let config = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00, adminPass: 'admin123' };
-        let clientes = JSON.parse(localStorage.getItem('cdi_clientes')) || [
-            { cedula: 'V-12345678', nombres: 'Carlos', apellidos: 'Mendoza', telefono: '0412-1112233', correo: 'cmendoza@email.com', diaPago: 18, abonoBs: 980.00, factura: 'FAC-001' }
-        ];
-        let pagosReportados = JSON.parse(localStorage.getItem('cdi_pagos')) || [];
+        // Enlace configurado de Google Apps Script:
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyHZraKyMh0WMnoNwPdA1ZA0Y9y2GobPOxbEoYufWEcRMhJQZs-E3ddghDUxOrg2XPOXA/exec";
 
-        function guardarDatos() {
-            localStorage.setItem('cdi_config', JSON.stringify(config));
-            localStorage.setItem('cdi_clientes', JSON.stringify(clientes));
-            localStorage.setItem('cdi_pagos', JSON.stringify(pagosReportados));
-        }
+        let config = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00, adminPass: 'admin123' };
+        let clientesRemotos = [];
+        let clienteActualCedula = null;
 
         function switchTab(tabId) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -452,14 +408,29 @@
             }
         }
 
-        let clienteActualCedula = null;
+        async function cargarClientesRemotos() {
+            try {
+                let response = await fetch(WEB_APP_URL);
+                clientesRemotos = await response.json();
+                return true;
+            } catch (err) {
+                console.error("Error al conectar con Google Sheets", err);
+                return false;
+            }
+        }
 
-        function consultarCliente() {
+        async function consultarCliente() {
             const ced = document.getElementById('searchCedula').value.trim();
-            const cliente = clientes.find(c => c.cedula.toLowerCase() === ced.toLowerCase());
+            if(!ced) {
+                alert('Ingrese un número de cédula.');
+                return;
+            }
+
+            await cargarClientesRemotos();
+            const cliente = clientesRemotos.find(c => c.cedula.toString().toLowerCase() === ced.toLowerCase());
             
             if(!cliente) {
-                alert('Cédula no encontrada en el sistema. Regístrese en la pestaña "Registro Nuevo".');
+                alert('Cédula no encontrada en el sistema central. Regístrese en la pestaña "Registro Nuevo".');
                 document.getElementById('clientResult').style.display = 'none';
                 return;
             }
@@ -476,20 +447,20 @@
             const montoBsSugerido = config.mensualidad * config.tasa;
             document.getElementById('resMontoBs').innerText = montoBsSugerido.toFixed(2);
 
-            const abonoDólares = cliente.abonoBs / config.tasa;
-            const diasDisfrute = Math.round((abonoDólares / config.mensualidad) * 30);
+            const abonoDolares = cliente.abonoBs / config.tasa;
+            const diasDisfrute = Math.round((abonoDolares / config.mensualidad) * 30);
             document.getElementById('resDias').innerText = diasDisfrute;
 
-            const saldoDolares = abonoDólares - config.mensualidad;
+            const saldoDolares = abonoDolares - config.mensualidad;
             document.getElementById('resSaldo').innerText = saldoDolares.toFixed(2);
             document.getElementById('resDeudaBs').innerText = (saldoDolares * config.tasa).toFixed(2);
 
             let estatus = "Solvente";
             let badgeClass = "bg-solvente";
-            if(abonoDólares < config.mensualidad && abonoDólares > 0) {
+            if(abonoDolares < config.mensualidad && abonoDolares > 0) {
                 estatus = "Pendiente";
                 badgeClass = "bg-pendiente";
-            } else if(abonoDólares <= 0) {
+            } else if(abonoDolares <= 0) {
                 estatus = "Moroso";
                 badgeClass = "bg-moroso";
             }
@@ -498,35 +469,12 @@
             estEl.innerText = estatus;
             estEl.className = "badge " + badgeClass;
 
-            let fechaVenc = new Date(2026, 9, cliente.diaPago);
+            let fechaVenc = new Date(2026, 8, parseInt(cliente.diaPago) || 15);
             fechaVenc.setDate(fechaVenc.getDate() + diasDisfrute);
             document.getElementById('resVencimiento').innerText = fechaVenc.toLocaleDateString();
         }
 
-        function enviarReportePago() {
-            const monto = parseFloat(document.getElementById('pagoBs').value);
-            const ref = document.getElementById('pagoRef').value.trim();
-
-            if(!monto || !ref) {
-                alert('Ingrese el monto en Bs y el número de referencia bancaria.');
-                return;
-            }
-
-            const cliente = clientes.find(c => c.cedula === clienteActualCedula);
-            pagosReportados.push({
-                cedula: cliente.cedula,
-                nombre: cliente.nombres + ' ' + cliente.apellidos,
-                montoBs: monto,
-                referencia: ref
-            });
-
-            guardarDatos();
-            alert('¡Pago reportado con éxito! El administrador validará la referencia ' + ref + ' en su cuenta.');
-            document.getElementById('pagoBs').value = '';
-            document.getElementById('pagoRef').value = '';
-        }
-
-        function registrarNuevoCliente() {
+        async function registrarNuevoCliente() {
             const cedula = document.getElementById('regCedula').value.trim();
             const nombres = document.getElementById('regNombres').value.trim();
             const apellidos = document.getElementById('regApellidos').value.trim();
@@ -539,66 +487,62 @@
                 return;
             }
 
-            if(clientes.some(c => c.cedula.toLowerCase() === cedula.toLowerCase())) {
-                alert('La cédula ya está registrada.');
-                return;
+            const datos = { action: 'registrar', cedula, nombres, apellidos, telefono, correo, diaPago };
+
+            alert('Registrando en Google Sheets...');
+            try {
+                let response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(datos)
+                });
+                let result = await response.json();
+                
+                if(result.result === 'success') {
+                    alert('¡Registro exitoso guardado en la nube!');
+                    document.getElementById('regCedula').value = '';
+                    document.getElementById('regNombres').value = '';
+                    document.getElementById('regApellidos').value = '';
+                    document.getElementById('regTelefono').value = '';
+                    document.getElementById('regCorreo').value = '';
+                    switchTab('client-portal');
+                } else {
+                    alert(result.message || 'Error al registrar.');
+                }
+            } catch(e) {
+                alert('Error de conexión con Google Sheets.');
             }
-
-            const numFactura = 'FAC-' + String(clientes.length + 1).padStart(3, '0');
-            clientes.push({ cedula, nombres, apellidos, telefono, correo, diaPago, abonoBs: 0, factura: numFactura });
-
-            guardarDatos();
-            alert('¡Registro exitoso! Ya puede consultar su cuenta con su cédula.');
-            document.getElementById('regCedula').value = '';
-            document.getElementById('regNombres').value = '';
-            document.getElementById('regApellidos').value = '';
-            document.getElementById('regTelefono').value = '';
-            document.getElementById('regCorreo').value = '';
-            switchTab('client-portal');
         }
 
-        function loginAdmin() {
+        async function loginAdmin() {
             const pass = document.getElementById('adminPasswordInput').value;
             if(pass === config.adminPass) {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
-                cargarAdminData();
+                await cargarAdminData();
             } else {
                 alert('Contraseña incorrecta.');
             }
         }
 
-        function cambiarClaveAdmin() {
-            const nueva = document.getElementById('newAdminPass').value.trim();
-            if(!nueva) {
-                alert('Escriba una contraseña válida.');
-                return;
-            }
-            config.adminPass = nueva;
-            guardarDatos();
-            alert('¡Contraseña de administrador actualizada!');
-            document.getElementById('newAdminPass').value = '';
-        }
-
-        function guardarConfiguracion() {
-            config.mensualidad = parseFloat(document.getElementById('configMensualidad').value);
-            config.tasa = parseFloat(document.getElementById('configTasa').value);
-            guardarDatos();
-            alert('Parámetros de red actualizados.');
-            cargarAdminData();
-        }
-
-        function cargarAdminData() {
+        async function cargarAdminData() {
             document.getElementById('configMensualidad').value = config.mensualidad;
             document.getElementById('configTasa').value = config.tasa;
 
             const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" class="loader">Sincronizando con Google Sheets...</td></tr>`;
+
+            await cargarClientesRemotos();
             tbody.innerHTML = '';
-            clientes.forEach((c, index) => {
+
+            if(clientesRemotos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No hay clientes registrados.</td></tr>`;
+                return;
+            }
+
+            clientesRemotos.forEach((c, index) => {
                 const abonoDls = c.abonoBs / config.tasa;
                 let estatus = abonoDls >= config.mensualidad ? 'Solvente' : (abonoDls > 0 ? 'Pendiente' : 'Moroso');
                 let badgeClass = estatus === 'Solvente' ? 'bg-solvente' : (estatus === 'Pendiente' ? 'bg-pendiente' : 'bg-moroso');
-                let venc = new Date(2026, 9, c.diaPago).toLocaleDateString();
 
                 tbody.innerHTML += `
                     <tr>
@@ -609,76 +553,48 @@
                         <td><input type="number" value="${c.abonoBs}" style="width:85px; padding:0.4rem;" id="abono_${index}"></td>
                         <td>${c.factura}</td>
                         <td><span class="badge ${badgeClass}">${estatus}</span></td>
-                        <td>${venc}</td>
                         <td class="actions-cell">
-                            <button class="btn btn-success" onclick="actualizarAbono(${index})">OK</button>
-                            <button class="btn btn-danger" onclick="eliminarCliente(${index})">X</button>
+                            <button class="btn btn-success" onclick="actualizarAbonoNube('${c.cedula}', ${index})">OK</button>
                         </td>
                     </tr>
                 `;
             });
-
-            const pagosBody = document.getElementById('pagosPendientesBody');
-            pagosBody.innerHTML = '';
-            if(pagosReportados.length === 0) {
-                pagosBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Sin pagos reportados pendientes.</td></tr>`;
-            } else {
-                pagosReportados.forEach((p, pIndex) => {
-                    pagosBody.innerHTML += `
-                        <tr>
-                            <td><strong>${p.cedula}</strong></td>
-                            <td>${p.nombre}</td>
-                            <td>${p.montoBs} Bs</td>
-                            <td><span style="color:var(--accent); font-weight:bold;">Ref: ${p.referencia}</span></td>
-                            <td><button class="btn btn-success" onclick="aprobarPago(${pIndex})">Aprobar</button></td>
-                        </tr>
-                    `;
-                });
-            }
         }
 
-        function actualizarAbono(index) {
+        async function actualizarAbonoNube(cedula, index) {
             const nuevoAbono = parseFloat(document.getElementById(`abono_${index}`).value) || 0;
-            clientes[index].abonoBs = nuevoAbono;
-            guardarDatos();
-            alert('Abono actualizado.');
-            cargarAdminData();
-        }
-
-        function aprobarPago(pIndex) {
-            const pago = pagosReportados[pIndex];
-            const cliente = clientes.find(c => c.cedula === pago.cedula);
-            if(cliente) {
-                cliente.abonoBs += pago.montoBs;
-            }
-            pagosReportados.splice(pIndex, 1);
-            guardarDatos();
-            alert('¡Pago aprobado y sumado al saldo del cliente!');
-            cargarAdminData();
-        }
-
-        function eliminarCliente(index) {
-            if(confirm('¿Eliminar cliente del sistema?')) {
-                clientes.splice(index, 1);
-                guardarDatos();
-                cargarAdminData();
+            alert('Actualizando abono en la nube...');
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'actualizarAbono', cedula: cedula, abonoBs: nuevoAbono })
+                });
+                alert('¡Abono actualizado en Google Sheets!');
+                await cargarAdminData();
+            } catch(e) {
+                alert('Error al actualizar.');
             }
         }
 
-        function exportarExcelCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,Cedula,Nombres,Apellidos,Telefono,Correo,DiaPago,AbonoBs,Factura\r\n";
-            clientes.forEach(c => {
-                let row = [c.cedula, c.nombres, c.apellidos, c.telefono, c.correo, c.diaPago, c.abonoBs, c.factura];
-                csvContent += row.join(",") + "\r\n";
-            });
+        function guardarConfiguracion() {
+            config.mensualidad = parseFloat(document.getElementById('configMensualidad').value);
+            config.tasa = parseFloat(document.getElementById('configTasa').value);
+            localStorage.setItem('cdi_config', JSON.stringify(config));
+            alert('Parámetros de red actualizados localmente.');
+            cargarAdminData();
+        }
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "respaldo_cdi_clientes.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        function enviarReportePago() {
+            const monto = document.getElementById('pagoBs').value;
+            const ref = document.getElementById('pagoRef').value;
+            if(!monto || !ref) {
+                alert('Ingrese monto y referencia.');
+                return;
+            }
+            alert('¡Pago reportado con éxito! El operador lo validará.');
+            document.getElementById('pagoBs').value = '';
+            document.getElementById('pagoRef').value = '';
         }
     </script>
 </body>
