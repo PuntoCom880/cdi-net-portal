@@ -337,7 +337,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxvSeqCBQDwBQXxqHAfMvMY-ehtgdw24ysypd2CP8k4jvkBA5SxyAk-thIIYnkm7D7dpw/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwCvdOdF39y19BvqwkoSAc_L5ASaZDmtMHVTzPnRhUxY6c6sduvBolcjYb5OWC_0vZFQw/exec";
 
         let datosGlobales = { clientes: [] };
 
@@ -387,7 +387,6 @@
             }
         }
 
-        // SEGURIDAD BLINDADA: Validación estricta directamente en Google Apps Script
         async function verificarAdmin() {
             let pass = prompt("Introduce la contraseña de administrador:");
             if (!pass) return;
@@ -619,7 +618,6 @@
             }
         }
 
-        // SEGURIDAD BLINDADA: Validación estricta en servidor antes de cambiar clave en la hoja 'Config'
         async function cambiarPasswordNube() {
             let actual = document.getElementById('passActual').value;
             let nueva = document.getElementById('passNueva').value;
@@ -630,7 +628,7 @@
             }
 
             try {
-                // Paso 1: Validar clave actual contra el servidor de forma segura
+                // 1. Validar si la contraseña actual es correcta en el servidor
                 let check = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'verificarAdmin', password: actual })
@@ -642,13 +640,13 @@
                     return;
                 }
 
-                // Paso 2: Si es correcta, cambiarla de manera segura en el servidor
+                // 2. Si es correcta, enviamos la orden para cambiarla y guardarla en la celda A1 de Config
                 let urlCambio = `${WEB_APP_URL}?action=cambiarPassword&nuevaPassword=${encodeURIComponent(nueva)}`;
                 let res = await fetch(urlCambio);
                 let result = await res.json();
                 
                 if(result.result === 'success') {
-                    alert('¡Contraseña actualizada de forma segura en Google Sheets!');
+                    alert('¡Contraseña actualizada con éxito y guardada en la hoja Config!');
                     document.getElementById('passActual').value = '';
                     document.getElementById('passNueva').value = '';
                 } else {
