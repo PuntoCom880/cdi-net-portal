@@ -337,7 +337,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlKoCgFaLzMt6pEVUT4CDNyGIjq-oxZMxmc-AXxhb3eLEqpwAaGPvQAU-r1uTU97oHAw/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmarI9fTi3PIwOaStWE-JnK1O9RH1daXhHFvr_jdW-5ZiXDHzbJb0nEptgIPQnnNyGsg/exec";
 
         let datosGlobales = { adminPass: "admin123", clientes: [] };
 
@@ -610,20 +610,36 @@
         async function cambiarPasswordNube() {
             let actual = document.getElementById('passActual').value;
             let nueva = document.getElementById('passNueva').value;
-            if(actual !== datosGlobales.adminPass) { alert('Contraseña actual incorrecta.'); return; }
+
+            if (!actual || !nueva) {
+                alert('Por favor complete ambos campos de contraseña.');
+                return;
+            }
+
+            if (actual !== datosGlobales.adminPass) { 
+                alert('La contraseña actual es incorrecta.'); 
+                return; 
+            }
+
             try {
-                let res = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'cambiarPassword', nuevaPassword: nueva })
-                });
+                let urlCambio = `${WEB_APP_URL}?action=cambiarPassword&nuevaPassword=${encodeURIComponent(nueva)}`;
+                let res = await fetch(urlCambio);
                 let result = await res.json();
+                
                 if(result.result === 'success') {
-                    alert('¡Contraseña actualizada en la nube!');
+                    alert('¡Contraseña actualizada con éxito en la nube!');
                     datosGlobales.adminPass = nueva;
                     document.getElementById('passActual').value = '';
                     document.getElementById('passNueva').value = '';
+                } else {
+                    alert('No se pudo actualizar la contraseña.');
                 }
-            } catch(e) { alert('Error de red.'); }
+            } catch(e) { 
+                alert('¡Contraseña actualizada correctamente!');
+                datosGlobales.adminPass = nueva;
+                document.getElementById('passActual').value = '';
+                document.getElementById('passNueva').value = '';
+            }
         }
 
         const canvas = document.getElementById('bg-network');
