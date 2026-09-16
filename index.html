@@ -346,6 +346,22 @@
             <div id="adminDashboard" style="display: none;">
                 <h2>> CONSOLA DE ADMINISTRACIÓN GLOBAL</h2>
                 
+                <!-- SECCIÓN DE SEGURIDAD / CAMBIO DE CONTRASEÑA -->
+                <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
+                    <h3 style="margin-top:0; color: var(--danger);">🔒 SEGURIDAD: CAMBIAR CONTRASEÑA</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label>CONTRASEÑA ACTUAL:</label>
+                            <input type="password" id="passActual" placeholder="••••••••">
+                        </div>
+                        <div class="form-group" style="flex:1; min-width: 200px;">
+                            <label>NUEVA CONTRASEÑA:</label>
+                            <input type="password" id="passNueva" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="cambiarPasswordAdmin()">ACTUALIZAR CONTRASEÑA DE OPERADOR</button>
+                </div>
+
                 <div class="card">
                     <h3 style="margin-top:0; color: var(--primary);">[+] PARÁMETROS DE LA RED</h3>
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
@@ -393,6 +409,7 @@
         // Enlace configurado de Google Apps Script:
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEnFmRW9XZi-bQ6Yytxo0I3Q4pFZA9P-T6hLnrVCTZLPXVK6-VbZUErcV_Zx35uVcZ9Q/exec";
 
+        // Si es la primera vez, la contraseña por defecto será 'admin123' (cámbiala de inmediato)
         let config = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00, adminPass: 'admin123' };
         let clientesRemotos = [];
         let clienteActualCedula = null;
@@ -522,6 +539,26 @@
             } else {
                 alert('Contraseña incorrecta.');
             }
+        }
+
+        function cambiarPasswordAdmin() {
+            const actual = document.getElementById('passActual').value;
+            const nueva = document.getElementById('passNueva').value;
+
+            if(actual !== config.adminPass) {
+                alert('La contraseña actual es incorrecta.');
+                return;
+            }
+            if(!nueva || nueva.length < 4) {
+                alert('La nueva contraseña debe tener al menos 4 caracteres.');
+                return;
+            }
+
+            config.adminPass = nueva;
+            localStorage.setItem('cdi_config', JSON.stringify(config));
+            alert('¡Contraseña de administrador actualizada con éxito!');
+            document.getElementById('passActual').value = '';
+            document.getElementById('passNueva').value = '';
         }
 
         async function cargarAdminData() {
