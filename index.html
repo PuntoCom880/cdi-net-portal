@@ -346,9 +346,9 @@
             <div id="adminDashboard" style="display: none;">
                 <h2>> CONSOLA DE ADMINISTRACIÓN GLOBAL</h2>
                 
-                <!-- SECCIÓN DE SEGURIDAD / CAMBIO DE CONTRASEÑA -->
+                <!-- SECCIÓN DE SEGURIDAD / CAMBIO DE CONTRASEÑA EN LA NUBE -->
                 <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
-                    <h3 style="margin-top:0; color: var(--danger);">🔒 SEGURIDAD: CAMBIAR CONTRASEÑA</h3>
+                    <h3 style="margin-top:0; color: var(--danger);">🔒 SEGURIDAD: CAMBIAR CONTRASEÑA EN LA NUBE</h3>
                     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                         <div class="form-group" style="flex:1; min-width: 200px;">
                             <label>CONTRASEÑA ACTUAL:</label>
@@ -359,7 +359,7 @@
                             <input type="password" id="passNueva" placeholder="••••••••">
                         </div>
                     </div>
-                    <button class="btn btn-danger" onclick="cambiarPasswordAdmin()">ACTUALIZAR CONTRASEÑA DE OPERADOR</button>
+                    <button class="btn btn-danger" onclick="cambiarPasswordNube()">ACTUALIZAR CONTRASEÑA EN GOOGLE SHEETS</button>
                 </div>
 
                 <div class="card">
@@ -374,12 +374,12 @@
                             <input type="number" id="configTasa" value="980.00" step="0.01">
                         </div>
                     </div>
-                    <button class="btn" onclick="guardarConfiguracion()">ACTUALIZAR PARÁMETROS</button>
+                    <button class="btn" onclick="guardarConfiguracionLocal()">ACTUALIZAR PARÁMETROS LOCALES</button>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; flex-wrap: wrap; gap: 1rem;">
                     <h3 style="margin:0;">[+] BASE DE DATOS DE CLIENTES (GOOGLE SHEETS)</h3>
-                    <button class="btn" style="width: auto;" onclick="cargarClientesRemotos()">🔄 ACTUALIZAR DATOS</button>
+                    <button class="btn" style="width: auto;" onclick="cargarDatosRemotos()">🔄 ACTUALIZAR DATOS</button>
                 </div>
 
                 <div class="table-responsive">
@@ -406,12 +406,11 @@
     </div>
 
     <script>
-        // Enlace configurado de Google Apps Script:
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEnFmRW9XZi-bQ6Yytxo0I3Q4pFZA9P-T6hLnrVCTZLPXVK6-VbZUErcV_Zx35uVcZ9Q/exec";
+        // Nueva URL de Google Apps Script configurada
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVzW9kNwQTb2uOoeyf2K-24FawwbArfBMqp9h9MIWJ0IYzr5wZryoq1YD-6LkC3eHnlw/exec";
 
-        // Si es la primera vez, la contraseña por defecto será 'admin123' (cámbiala de inmediato)
-        let config = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00, adminPass: 'admin123' };
-        let clientesRemotos = [];
+        let configLocal = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00 };
+        let datosRemotosGlobal = { adminPass: "admin123", clientes: [] };
         let clienteActualCedula = null;
 
         function switchTab(tabId) {
@@ -425,10 +424,15 @@
             }
         }
 
-        async function cargarClientesRemotos() {
+        async function cargarDatosRemotos() {
             try {
                 let response = await fetch(WEB_APP_URL);
-                clientesRemotos = await response.json();
+                let data = await response.json();
+                if (Array.isArray(data)) {
+                    datosRemotosGlobal.clientes = data;
+                } else {
+                    datosRemotosGlobal = data;
+                }
                 return true;
             } catch (err) {
                 console.error("Error al conectar con Google Sheets", err);
@@ -443,11 +447,11 @@
                 return;
             }
 
-            await cargarClientesRemotos();
-            const cliente = clientesRemotos.find(c => c.cedula.toString().toLowerCase() === ced.toLowerCase());
+            await cargarDatosRemotos();
+            const cliente = datosRemotosGlobal.clientes.find(c => c.cedula.toString().toLowerCase() === ced.toLowerCase());
             
             if(!cliente) {
-                alert('Cédula no encontrada en el sistema central. Regístrese en la pestaña "Registro Nuevo".');
+                alert('Cédula no encontrada en el sistema central.');
                 document.getElementById('clientResult').style.display = 'none';
                 return;
             }
@@ -458,23 +462,23 @@
             document.getElementById('resNombre').innerText = cliente.nombres + ' ' + cliente.apellidos;
             document.getElementById('resTelefono').innerText = cliente.telefono;
             document.getElementById('resDia').innerText = cliente.diaPago;
-            document.getElementById('resMensualidad').innerText = config.mensualidad.toFixed(2);
-            document.getElementById('resTasa').innerText = config.tasa.toFixed(2);
+            document.getElementById('resMensualidad').innerText = configLocal.mensualidad.toFixed(2);
+            document.getElementById('resTasa').innerText = configLocal.tasa.toFixed(2);
 
-            const montoBsSugerido = config.mensualidad * config.tasa;
+            const montoBsSugerido = configLocal.mensualidad * configLocal.tasa;
             document.getElementById('resMontoBs').innerText = montoBsSugerido.toFixed(2);
 
-            const abonoDolares = cliente.abonoBs / config.tasa;
-            const diasDisfrute = Math.round((abonoDolares / config.mensualidad) * 30);
+            const abonoDolares = cliente.abonoBs / configLocal.tasa;
+            const diasDisfrute = Math.round((abonoDolares / configLocal.mensualidad) * 30);
             document.getElementById('resDias').innerText = diasDisfrute;
 
-            const saldoDolares = abonoDolares - config.mensualidad;
+            const saldoDolares = abonoDolares - configLocal.mensualidad;
             document.getElementById('resSaldo').innerText = saldoDolares.toFixed(2);
-            document.getElementById('resDeudaBs').innerText = (saldoDolares * config.tasa).toFixed(2);
+            document.getElementById('resDeudaBs').innerText = (saldoDolares * configLocal.tasa).toFixed(2);
 
             let estatus = "Solvente";
             let badgeClass = "bg-solvente";
-            if(abonoDolares < config.mensualidad && abonoDolares > 0) {
+            if(abonoDolares < configLocal.mensualidad && abonoDolares > 0) {
                 estatus = "Pendiente";
                 badgeClass = "bg-pendiente";
             } else if(abonoDolares <= 0) {
@@ -523,7 +527,7 @@
                     document.getElementById('regCorreo').value = '';
                     switchTab('client-portal');
                 } else {
-                    alert(result.message || 'Error al registrar.');
+                    alert('Error al registrar.');
                 }
             } catch(e) {
                 alert('Error de conexión con Google Sheets.');
@@ -531,21 +535,25 @@
         }
 
         async function loginAdmin() {
-            const pass = document.getElementById('adminPasswordInput').value;
-            if(pass === config.adminPass) {
+            const passInput = document.getElementById('adminPasswordInput').value;
+            
+            alert('Verificando credenciales con la base de datos central...');
+            await cargarDatosRemotos();
+
+            if(passInput === datosRemotosGlobal.adminPass) {
                 document.getElementById('adminLoginBox').style.display = 'none';
                 document.getElementById('adminDashboard').style.display = 'block';
                 await cargarAdminData();
             } else {
-                alert('Contraseña incorrecta.');
+                alert('Contraseña incorrecta. Acceso denegado.');
             }
         }
 
-        function cambiarPasswordAdmin() {
+        async function cambiarPasswordNube() {
             const actual = document.getElementById('passActual').value;
             const nueva = document.getElementById('passNueva').value;
 
-            if(actual !== config.adminPass) {
+            if(actual !== datosRemotosGlobal.adminPass) {
                 alert('La contraseña actual es incorrecta.');
                 return;
             }
@@ -554,31 +562,45 @@
                 return;
             }
 
-            config.adminPass = nueva;
-            localStorage.setItem('cdi_config', JSON.stringify(config));
-            alert('¡Contraseña de administrador actualizada con éxito!');
-            document.getElementById('passActual').value = '';
-            document.getElementById('passNueva').value = '';
+            alert('Actualizando contraseña central en Google Sheets...');
+            try {
+                let response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'cambiarPassword', nuevaPassword: nueva })
+                });
+                let result = await response.json();
+
+                if(result.result === 'success') {
+                    alert('¡Contraseña de administrador actualizada con éxito en la nube!');
+                    datosRemotosGlobal.adminPass = nueva;
+                    document.getElementById('passActual').value = '';
+                    document.getElementById('passNueva').value = '';
+                } else {
+                    alert('No se pudo actualizar la contraseña.');
+                }
+            } catch(e) {
+                alert('Error de red al actualizar la contraseña.');
+            }
         }
 
         async function cargarAdminData() {
-            document.getElementById('configMensualidad').value = config.mensualidad;
-            document.getElementById('configTasa').value = config.tasa;
+            document.getElementById('configMensualidad').value = configLocal.mensualidad;
+            document.getElementById('configTasa').value = configLocal.tasa;
 
             const tbody = document.getElementById('adminTableBody');
             tbody.innerHTML = `<tr><td colspan="8" class="loader">Sincronizando con Google Sheets...</td></tr>`;
 
-            await cargarClientesRemotos();
+            await cargarDatosRemotos();
             tbody.innerHTML = '';
 
-            if(clientesRemotos.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-muted);">No hay clientes registrados.</td></tr>`;
+            if(datosRemotosGlobal.clientes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No hay clientes registrados.</td></tr>`;
                 return;
             }
 
-            clientesRemotos.forEach((c, index) => {
-                const abonoDls = c.abonoBs / config.tasa;
-                let estatus = abonoDls >= config.mensualidad ? 'Solvente' : (abonoDls > 0 ? 'Pendiente' : 'Moroso');
+            datosRemotosGlobal.clientes.forEach((c, index) => {
+                const abonoDls = c.abonoBs / configLocal.tasa;
+                let estatus = abonoDls >= configLocal.mensualidad ? 'Solvente' : (abonoDls > 0 ? 'Pendiente' : 'Moroso');
                 let badgeClass = estatus === 'Solvente' ? 'bg-solvente' : (estatus === 'Pendiente' ? 'bg-pendiente' : 'bg-moroso');
 
                 tbody.innerHTML += `
@@ -614,11 +636,11 @@
             }
         }
 
-        function guardarConfiguracion() {
-            config.mensualidad = parseFloat(document.getElementById('configMensualidad').value);
-            config.tasa = parseFloat(document.getElementById('configTasa').value);
-            localStorage.setItem('cdi_config', JSON.stringify(config));
-            alert('Parámetros de red actualizados localmente.');
+        function guardarConfiguracionLocal() {
+            configLocal.mensualidad = parseFloat(document.getElementById('configMensualidad').value);
+            configLocal.tasa = parseFloat(document.getElementById('configTasa').value);
+            localStorage.setItem('cdi_config', JSON.stringify(configLocal));
+            alert('Parámetros guardados localmente.');
             cargarAdminData();
         }
 
