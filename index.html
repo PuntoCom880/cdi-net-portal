@@ -3,557 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOC Portal - CDI Internet Network</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>CDI_NET // NOC & BILLING CONTROL</title>
     <style>
-        :root {
-            --bg-deep: #090d16;
-            --bg-card: #111827;
-            --border-color: #1f293d;
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.3);
-            --accent: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+        /* Fondo animado de red global */
+        #bg-network {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background-color: #0b0f19;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
-            min-height: 100vh;
-        }
-
-        header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.75rem;
-            font-weight: 800;
             color: #ffffff;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        header h1 span {
-            color: var(--accent);
-        }
-
-        header p {
-            margin: 0.5rem 0 0 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #0b0f19;
         }
 
         .container {
+            position: relative;
+            z-index: 1;
             max-width: 1000px;
-            margin: 2rem auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 2.5rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 204, 0.2);
         }
 
-        .nav-tabs {
+        h1, h2, h3 {
+            color: #00ffcc;
+            text-align: center;
+        }
+
+        .nav-buttons {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1.5rem;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
-        .nav-tabs button {
-            background: #1e293b;
-            color: var(--text-muted);
-            border: 1px solid var(--border-color);
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            border-radius: 8px;
+        button, .btn {
+            background: #00ffcc;
+            color: #0b0f19;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
+            transition: 0.3s;
         }
 
-        .nav-tabs button:hover {
-            border-color: var(--primary);
-            color: #ffffff;
+        button:hover {
+            background: #00b38f;
+            box-shadow: 0 0 10px #00ffcc;
         }
 
-        .nav-tabs button.active {
-            background: var(--primary);
+        .btn-danger {
+            background: #dc3545;
             color: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
         }
-
-        .section {
-            display: none;
-            animation: fadeIn 0.4s ease-in-out;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2, h3 {
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: -0.05em;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
+        .btn-danger:hover {
+            background: #b02a37;
+            box-shadow: 0 0 10px #dc3545;
         }
 
         input, select {
             width: 100%;
-            padding: 0.85rem 1rem;
-            background: #090d16;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0 15px 0;
+            background: #1e293b;
+            border: 1px solid #334155;
             color: white;
-            font-size: 1rem;
+            border-radius: 4px;
             box-sizing: border-box;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-        }
-
-        button.btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.85rem 1.5rem;
-            font-size: 0.95rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            font-family: 'JetBrains Mono', monospace;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-        }
-
-        button.btn:hover {
-            background-color: #2563eb;
-            transform: translateY(-1px);
-        }
-
-        .btn-success { 
-            background-color: var(--accent) !important; 
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
-        }
-        .btn-success:hover { background-color: #059669 !important; }
-
-        .btn-danger { background-color: var(--danger) !important; }
-
-        .card {
-            background: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .pago-movil-box {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 2px solid var(--accent);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            margin-top: 15px;
         }
 
         th, td {
-            padding: 0.85rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 12px;
             text-align: left;
-            font-size: 0.85rem;
-            font-family: 'JetBrains Mono', monospace;
+            border-bottom: 1px solid #334155;
         }
 
         th {
             background-color: #1e293b;
-            color: var(--text-muted);
-            font-weight: 700;
+            color: #00ffcc;
         }
 
-        .badge {
-            padding: 0.3rem 0.6rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            text-transform: uppercase;
+        .section {
+            display: none;
         }
-        .bg-solvente { background-color: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .bg-pendiente { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .bg-moroso { background-color: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        .actions-cell { display: flex; gap: 0.5rem; }
-        .actions-cell button { padding: 0.4rem 0.7rem; font-size: 0.75rem; width: auto; }
-        .table-responsive { overflow-x: auto; }
-        hr { border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0; }
-        .search-box { display: flex; gap: 0.75rem; }
-        .loader { text-align: center; padding: 1rem; font-family: 'JetBrains Mono', monospace; color: var(--primary); }
+        .active-section {
+            display: block;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>[CDI_NET] <span>// NOC & BILLING CONTROL</span></h1>
-        <p>Sistema automatizado de gestión de abonados y pasarela de pagos</p>
-    </header>
+    <!-- Fondo dinámico de red -->
+    <canvas id="bg-network"></canvas>
 
     <div class="container">
-        <div class="nav-tabs">
-            <button class="active" onclick="switchTab('client-portal')">⚡ Portal del Cliente</button>
-            <button onclick="switchTab('client-register')">➕ Registro Nuevo</button>
-            <button onclick="switchTab('admin-panel')">🔒 Panel Admin</button>
+        <h1>[CDI_NET] // NOC & BILLING CONTROL</h1>
+        <p style="text-align: center; color: #94a3b8;">Sistema automatizado de gestión de abonados y pasarela de pagos</p>
+
+        <!-- Botones de Navegación -->
+        <div class="nav-buttons">
+            <button onclick="mostrarSeccion('portalCliente')">Portal del Cliente</button>
+            <button onclick="mostrarSeccion('registroNuevo')">Registro Nuevo</button>
+            <button onclick="verificarAdmin()">Panel Admin</button>
         </div>
 
-        <!-- 1. PORTAL DEL CLIENTE -->
-        <div id="client-portal" class="section active">
-            <h2>> CONSULTA DE ESTADO DE CONEXIÓN</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Ingrese su número de cédula para consultar su estatus y ver los datos de pago móvil.</p>
-            
-            <div class="form-group" style="margin-top: 1.5rem;">
-                <label>NÚMERO DE CÉDULA:</label>
-                <div class="search-box">
-                    <input type="text" id="searchCedula" placeholder="Ej: 25975209">
-                    <button class="btn" style="width: 160px;" onclick="consultarCliente()">CONSULTAR</button>
-                </div>
-            </div>
-
-            <div id="clientResult" style="display: none;">
-                <div class="card">
-                    <h3 style="margin-top:0; color: var(--primary);">[+] INFORMACIÓN DEL SUSCRIPTOR</h3>
-                    <p><strong>Titular:</strong> <span id="resNombre"></span></p>
-                    <p><strong>Teléfono:</strong> <span id="resTelefono"></span></p>
-                    <p><strong>Día de Corte:</strong> <span id="resDia"></span></p>
-                    <p><strong>Estatus del Nodo:</strong> <span id="resEstatus" class="badge"></span></p>
-                    <hr>
-                    <p><strong>Tarifa Base ($):</strong> $<span id="resMensualidad">1.00</span> | <strong>Tasa BCV:</strong> <span id="resTasa">980.00</span> Bs/$</p>
-                    <p><strong>Monto Sugerido en Bs:</strong> <span id="resMontoBs">0.00</span> Bs</p>
-                    <p><strong>Días de Servicio Asignados:</strong> <span id="resDias">0</span> días</p>
-                    <p><strong>Fecha de Vencimiento:</strong> <span id="resVencimiento">--/--/----</span></p>
-                    <p><strong>Saldo / Deuda Pendiente ($):</strong> $<span id="resSaldo">0.00</span> (<span id="resDeudaBs">0.00</span> Bs)</p>
-                </div>
-
-                <div class="pago-movil-box">
-                    <h3 style="margin-top:0; color: var(--accent);">📱 DATOS OFICIALES PARA PAGO MÓVIL</h3>
-                    <p style="margin: 0.4rem 0; font-size: 1.05rem;"><strong>Banco:</strong> Banco Venezolano de Crédito (0104)</p>
-                    <p style="margin: 0.4rem 0; font-size: 1.05rem;"><strong>Cédula:</strong> 25.975.209</p>
-                    <p style="margin: 0.4rem 0; font-size: 1.05rem;"><strong>Teléfono:</strong> 0412-1199929</p>
-                </div>
-
-                <div class="card" style="border-color: rgba(16, 185, 129, 0.3);">
-                    <h3 style="margin-top:0; color: var(--accent);">[+] REPORTAR PAGO MÓVIL REALIZADO</h3>
-                    <div class="form-group">
-                        <label>MONTO ABONADO EN BS:</label>
-                        <input type="number" id="pagoBs" placeholder="Ej: 980">
-                    </div>
-                    <div class="form-group">
-                        <label>NÚMERO DE REFERENCIA BANCARIA:</label>
-                        <input type="text" id="pagoRef" placeholder="Ej: 482910">
-                    </div>
-                    <button class="btn btn-success" onclick="enviarReportePago()">ENVIAR REPORTE DE PAGO</button>
-                </div>
+        <!-- SECCIÓN: PORTAL DEL CLIENTE -->
+        <div id="portalCliente" class="section active-section">
+            <h2>Portal del Cliente</h2>
+            <p>Consulte el estado de su cuenta y día de pago en la red.</p>
+            <input type="text" id="buscadorCliente" placeholder="Buscar por cédula o nombre..." onkeyup="filtrarClientesPublico()">
+            <div style="overflow-x: auto;">
+                <table id="tablaClientesPublica">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Día Pago</th>
+                            <th>Abono Bs</th>
+                            <th>Estatus</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyPublico">
+                        <!-- Cargado dinámicamente -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- 2. REGISTRO DE NUEVOS CLIENTES -->
-        <div id="client-register" class="section">
-            <h2>> ALTA DE NUEVO SUSCRIPTOR</h2>
-            <div style="margin-top: 1.5rem;">
-                <div class="form-group">
-                    <label>CÉDULA DE IDENTIDAD:</label>
-                    <input type="text" id="regCedula" placeholder="Ej: 25975209">
-                </div>
-                <div class="form-group">
-                    <label>NOMBRES:</label>
-                    <input type="text" id="regNombres" placeholder="Ej: Carlos">
-                </div>
-                <div class="form-group">
-                    <label>APELLIDOS:</label>
-                    <input type="text" id="regApellidos" placeholder="Ej: Mendoza">
-                </div>
-                <div class="form-group">
-                    <label>TELÉFONO DE CONTACTO:</label>
-                    <input type="text" id="regTelefono" placeholder="Ej: 0412-1112233">
-                </div>
-                <div class="form-group">
-                    <label>CORREO ELECTRÓNICO:</label>
-                    <input type="email" id="regCorreo" placeholder="usuario@domain.com">
-                </div>
-                <div class="form-group">
-                    <label>DÍA DE PAGO ASIGNADO (1 - 31):</label>
-                    <input type="number" id="regDiaPago" min="1" max="31" value="15">
-                </div>
-                <button class="btn btn-success" onclick="registrarNuevoCliente()">REGISTRAR EN EL SISTEMA</button>
-            </div>
-        </div>
-
-        <!-- 3. PANEL DE ADMINISTRADOR -->
-        <div id="admin-panel" class="section">
-            <div id="adminLoginBox">
-                <h2>> AUTENTICACIÓN DE OPERADOR</h2>
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label>CONTRASEÑA DE ACCESO:</label>
-                    <input type="password" id="adminPasswordInput" placeholder="••••••••">
-                </div>
-                <button class="btn" onclick="loginAdmin()">AUTENTICAR</button>
-            </div>
-
-            <div id="adminDashboard" style="display: none;">
-                <h2>> CONSOLA DE ADMINISTRACIÓN GLOBAL</h2>
+        <!-- SECCIÓN: REGISTRO NUEVO -->
+        <div id="registroNuevo" class="section">
+            <h2>Registro de Nuevo Abonado</h2>
+            <form id="formRegistro" onsubmit="registrarCliente(event)">
+                <label>Cédula:</label>
+                <input type="text" id="regCedula" required>
                 
-                <!-- SECCIÓN DE SEGURIDAD / CAMBIO DE CONTRASEÑA EN LA NUBE -->
-                <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
-                    <h3 style="margin-top:0; color: var(--danger);">🔒 SEGURIDAD: CAMBIAR CONTRASEÑA EN LA NUBE</h3>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <div class="form-group" style="flex:1; min-width: 200px;">
-                            <label>CONTRASEÑA ACTUAL:</label>
-                            <input type="password" id="passActual" placeholder="••••••••">
-                        </div>
-                        <div class="form-group" style="flex:1; min-width: 200px;">
-                            <label>NUEVA CONTRASEÑA:</label>
-                            <input type="password" id="passNueva" placeholder="••••••••">
-                        </div>
-                    </div>
-                    <button class="btn btn-danger" onclick="cambiarPasswordNube()">ACTUALIZAR CONTRASEÑA EN GOOGLE SHEETS</button>
-                </div>
+                <label>Nombres:</label>
+                <input type="text" id="regNombres" required>
+                
+                <label>Apellidos:</label>
+                <input type="text" id="regApellidos" required>
+                
+                <label>Teléfono:</label>
+                <input type="text" id="regTelefono" required>
+                
+                <label>Correo Electrónico:</label>
+                <input type="email" id="regCorreo" required>
+                
+                <label>Día de Pago (1 al 31):</label>
+                <input type="number" id="regDiaPago" min="1" max="31" required>
+                
+                <button type="submit">Guardar en Google Sheets</button>
+            </form>
+        </div>
 
-                <div class="card">
-                    <h3 style="margin-top:0; color: var(--primary);">[+] PARÁMETROS DE LA RED</h3>
-                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                        <div class="form-group" style="flex:1; min-width: 200px;">
-                            <label>MENSUALIDAD ($):</label>
-                            <input type="number" id="configMensualidad" value="1.00" step="0.01">
-                        </div>
-                        <div class="form-group" style="flex:1; min-width: 200px;">
-                            <label>TASA DE CAMBIO (BS/$):</label>
-                            <input type="number" id="configTasa" value="980.00" step="0.01">
-                        </div>
-                    </div>
-                    <button class="btn" onclick="guardarConfiguracionLocal()">ACTUALIZAR PARÁMETROS LOCALES</button>
-                </div>
+        <!-- SECCIÓN: PANEL ADMIN -->
+        <div id="panelAdmin" class="section">
+            <h2>Consola de Administración</h2>
+            
+            <!-- Cambiar Contraseña -->
+            <div style="background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 6px; border: 1px solid #dc3545; margin-bottom: 20px;">
+                <h3 style="color: #ff6b6b; margin-top:0;">Seguridad: Cambiar Contraseña en la Nube</h3>
+                <label>Contraseña Actual:</label>
+                <input type="password" id="passActual">
+                <label>Nueva Contraseña:</label>
+                <input type="password" id="passNueva">
+                <button type="button" onclick="cambiarPasswordNube()" style="background: #dc3545; color: white;">Actualizar Contraseña en Google Sheets</button>
+            </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3 style="margin:0;">[+] BASE DE DATOS DE CLIENTES (GOOGLE SHEETS)</h3>
-                    <button class="btn" style="width: auto;" onclick="cargarDatosRemotos()">🔄 ACTUALIZAR DATOS</button>
-                </div>
-
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>CÉDULA</th>
-                                <th>CLIENTE</th>
-                                <th>TELÉFONO</th>
-                                <th>DÍA</th>
-                                <th>ABONO BS</th>
-                                <th>FACTURA</th>
-                                <th>ESTATUS</th>
-                                <th>ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody">
-                            <tr><td colspan="8" class="loader">Cargando datos desde Google Sheets...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Base de Datos de Clientes con Buscador y Eliminación -->
+            <h3>Base de Datos de Clientes (Google Sheets)</h3>
+            <div class="search-box">
+                <input type="text" id="buscadorAdmin" placeholder="🔍 Motor de búsqueda de clientes (filtrar por cédula o nombre)..." onkeyup="filtrarClientesAdmin()">
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table id="tablaClientesAdmin">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Cliente</th>
+                            <th>Teléfono</th>
+                            <th>Día</th>
+                            <th>Abono Bs</th>
+                            <th>Factura</th>
+                            <th>Estatus</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAdmin">
+                        <!-- Cargado dinámicamente -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
+    <!-- Script principal de lógica y animación -->
     <script>
-        // Nueva URL de Google Apps Script configurada
+        // URL de Google Apps Script integrada correctamente
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz47HbcisPjyr_hZQ9rNXlMEE9poLpFTq4Vl4R1MctdQGwLrJhnsg3VKB7b6scWFmcafA/exec";
 
-        let configLocal = JSON.parse(localStorage.getItem('cdi_config')) || { mensualidad: 1.00, tasa: 980.00 };
-        let datosRemotosGlobal = { adminPass: "admin123", clientes: [] };
-        let clienteActualCedula = null;
+        let datosGlobales = { adminPass: "admin123", clientes: [] };
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
-            if(tabId === 'admin-panel') {
-                document.getElementById('adminLoginBox').style.display = 'block';
-                document.getElementById('adminDashboard').style.display = 'none';
-            }
-        }
+        // Cargar datos al iniciar
+        window.onload = function() {
+            cargarDatosRemotos();
+        };
 
         async function cargarDatosRemotos() {
             try {
                 let response = await fetch(WEB_APP_URL);
                 let data = await response.json();
-                if (Array.isArray(data)) {
-                    datosRemotosGlobal.clientes = data;
-                } else {
-                    datosRemotosGlobal = data;
-                }
-                return true;
-            } catch (err) {
-                console.error("Error al conectar con Google Sheets", err);
-                return false;
+                datosGlobales.adminPass = data.adminPass || "admin123";
+                datosGlobales.clientes = data.clientes || [];
+                renderizarTablas();
+            } catch (e) {
+                console.error("Error cargando datos remotos:", e);
             }
         }
 
-        async function consultarCliente() {
-            const ced = document.getElementById('searchCedula').value.trim();
-            if(!ced) {
-                alert('Ingrese un número de cédula.');
-                return;
-            }
-
-            await cargarDatosRemotos();
-            const cliente = datosRemotosGlobal.clientes.find(c => c.cedula.toString().toLowerCase() === ced.toLowerCase());
-            
-            if(!cliente) {
-                alert('Cédula no encontrada en el sistema central.');
-                document.getElementById('clientResult').style.display = 'none';
-                return;
-            }
-
-            clienteActualCedula = cliente.cedula;
-            document.getElementById('clientResult').style.display = 'block';
-
-            document.getElementById('resNombre').innerText = cliente.nombres + ' ' + cliente.apellidos;
-            document.getElementById('resTelefono').innerText = cliente.telefono;
-            document.getElementById('resDia').innerText = cliente.diaPago;
-            document.getElementById('resMensualidad').innerText = configLocal.mensualidad.toFixed(2);
-            document.getElementById('resTasa').innerText = configLocal.tasa.toFixed(2);
-
-            const montoBsSugerido = configLocal.mensualidad * configLocal.tasa;
-            document.getElementById('resMontoBs').innerText = montoBsSugerido.toFixed(2);
-
-            const abonoDolares = cliente.abonoBs / configLocal.tasa;
-            const diasDisfrute = Math.round((abonoDolares / configLocal.mensualidad) * 30);
-            document.getElementById('resDias').innerText = diasDisfrute;
-
-            const saldoDolares = abonoDolares - configLocal.mensualidad;
-            document.getElementById('resSaldo').innerText = saldoDolares.toFixed(2);
-            document.getElementById('resDeudaBs').innerText = (saldoDolares * configLocal.tasa).toFixed(2);
-
-            let estatus = "Solvente";
-            let badgeClass = "bg-solvente";
-            if(abonoDolares < configLocal.mensualidad && abonoDolares > 0) {
-                estatus = "Pendiente";
-                badgeClass = "bg-pendiente";
-            } else if(abonoDolares <= 0) {
-                estatus = "Moroso";
-                badgeClass = "bg-moroso";
-            }
-
-            const estEl = document.getElementById('resEstatus');
-            estEl.innerText = estatus;
-            estEl.className = "badge " + badgeClass;
-
-            let fechaVenc = new Date(2026, 8, parseInt(cliente.diaPago) || 15);
-            fechaVenc.setDate(fechaVenc.getDate() + diasDisfrute);
-            document.getElementById('resVencimiento').innerText = fechaVenc.toLocaleDateString();
+        function mostrarSeccion(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
+            document.getElementById(id).classList.add('active-section');
         }
 
-        async function registrarNuevoCliente() {
-            const cedula = document.getElementById('regCedula').value.trim();
-            const nombres = document.getElementById('regNombres').value.trim();
-            const apellidos = document.getElementById('regApellidos').value.trim();
-            const telefono = document.getElementById('regTelefono').value.trim();
-            const correo = document.getElementById('regCorreo').value.trim();
-            const diaPago = parseInt(document.getElementById('regDiaPago').value);
-
-            if(!cedula || !nombres || !apellidos || !telefono) {
-                alert('Complete los campos obligatorios.');
-                return;
+        function verificarAdmin() {
+            let pass = prompt("Introduce la contraseña de administrador:");
+            if (pass === datosGlobales.adminPass) {
+                mostrarSeccion('panelAdmin');
+                renderizarTablas();
+            } else {
+                alert("Contraseña incorrecta.");
             }
+        }
 
-            const datos = { action: 'registrar', cedula, nombres, apellidos, telefono, correo, diaPago };
+        function renderizarTablas() {
+            // Renderizar tabla pública
+            let tbodyPub = document.getElementById('tbodyPublico');
+            tbodyPub.innerHTML = '';
+            datosGlobales.clientes.forEach(c => {
+                tbodyPub.innerHTML += `
+                    <tr>
+                        <td>${c.cedula}</td>
+                        <td>${c.nombres} ${c.apellidos}</td>
+                        <td>${c.telefono}</td>
+                        <td>${c.diaPago}</td>
+                        <td>${c.abonoBs}</td>
+                        <td><span style="color: ${c.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b'}">${c.estatusPago}</span></td>
+                    </tr>
+                `;
+            });
+
+            // Renderizar tabla admin
+            let tbodyAdmin = document.getElementById('tbodyAdmin');
+            tbodyAdmin.innerHTML = '';
+            datosGlobales.clientes.forEach(c => {
+                tbodyAdmin.innerHTML += `
+                    <tr>
+                        <td>${c.cedula}</td>
+                        <td>${c.nombres} ${c.apellidos}</td>
+                        <td>${c.telefono}</td>
+                        <td>${c.diaPago}</td>
+                        <td><input type="number" value="${c.abonoBs}" style="width:80px;" id="abono_${c.cedula}"></td>
+                        <td>${c.factura}</td>
+                        <td><span style="color: ${c.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b'}">${c.estatusPago}</span></td>
+                        <td>
+                            <button onclick="guardarAbono('${c.cedula}')" style="padding: 5px 10px; font-size: 12px;">OK</button>
+                            <button onclick="eliminarClienteNube('${c.cedula}')" class="btn-danger" style="padding: 5px 10px; font-size: 12px; margin-top:5px;">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- MOTOR DE BÚSQUEDA ---
+        function filtrarClientesPublico() {
+            let filtro = document.getElementById('buscadorCliente').value.toLowerCase();
+            let filas = document.querySelectorAll('#tbodyPublico tr');
+            filas.forEach(fila => {
+                let texto = fila.textContent.toLowerCase();
+                fila.style.display = texto.includes(filtro) ? '' : 'none';
+            });
+        }
+
+        function filtrarClientesAdmin() {
+            let filtro = document.getElementById('buscadorAdmin').value.toLowerCase();
+            let filas = document.querySelectorAll('#tbodyAdmin tr');
+            filas.forEach(fila => {
+                let texto = fila.textContent.toLowerCase();
+                fila.style.display = texto.includes(filtro) ? '' : 'none';
+            });
+        }
+
+        // --- ACCIONES CON GOOGLE SHEETS ---
+        async function registrarCliente(event) {
+            event.preventDefault();
+            let nuevo = {
+                action: 'registrar',
+                cedula: document.getElementById('regCedula').value,
+                nombres: document.getElementById('regNombres').value,
+                apellidos: document.getElementById('regApellidos').value,
+                telefono: document.getElementById('regTelefono').value,
+                correo: document.getElementById('regCorreo').value,
+                diaPago: document.getElementById('regDiaPago').value
+            };
 
             alert('Registrando en Google Sheets...');
             try {
-                let response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(datos)
-                });
-                let result = await response.json();
-                
+                let res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(nuevo) });
+                let result = await res.json();
                 if(result.result === 'success') {
-                    alert('¡Registro exitoso guardado en la nube!');
-                    document.getElementById('regCedula').value = '';
-                    document.getElementById('regNombres').value = '';
-                    document.getElementById('regApellidos').value = '';
-                    document.getElementById('regTelefono').value = '';
-                    document.getElementById('regCorreo').value = '';
-                    switchTab('client-portal');
+                    alert('¡Cliente registrado con éxito!');
+                    location.reload();
                 } else {
                     alert('Error al registrar.');
                 }
             } catch(e) {
-                alert('Error de conexión con Google Sheets.');
+                alert('Error de red al registrar.');
             }
         }
 
-        async function loginAdmin() {
-            const passInput = document.getElementById('adminPasswordInput').value;
-            
-            alert('Verificando credenciales con la base de datos central...');
-            await cargarDatosRemotos();
+        async function guardarAbono(cedula) {
+            let abono = document.getElementById(`abono_${cedula}`).value;
+            try {
+                let res = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'actualizarAbono', cedula: cedula, abonoBs: abono })
+                });
+                let result = await res.json();
+                if(result.result === 'success') {
+                    alert('¡Abono actualizado con éxito!');
+                    cargarDatosRemotos();
+                }
+            } catch(e) {
+                alert('Error de red al actualizar abono.');
+            }
+        }
 
-            if(passInput === datosRemotosGlobal.adminPass) {
-                document.getElementById('adminLoginBox').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                await cargarAdminData();
-            } else {
-                alert('Contraseña incorrecta. Acceso denegado.');
+        async function eliminarClienteNube(cedula) {
+            if (!confirm(`¿Estás seguro de eliminar al cliente con cédula ${cedula}? Se borrará permanentemente de Google Sheets.`)) return;
+
+            try {
+                let res = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'eliminarCliente', cedula: cedula })
+                });
+                let result = await res.json();
+                if(result.result === 'success') {
+                    alert('¡Cliente eliminado de Google Sheets!');
+                    cargarDatosRemotos();
+                } else {
+                    alert('No se pudo eliminar el cliente.');
+                }
+            } catch(e) {
+                alert('Error de red al intentar eliminar.');
             }
         }
 
         async function cambiarPasswordNube() {
-            const actual = document.getElementById('passActual').value;
-            const nueva = document.getElementById('passNueva').value;
+            let actual = document.getElementById('passActual').value;
+            let nueva = document.getElementById('passNueva').value;
 
-            if(actual !== datosRemotosGlobal.adminPass) {
+            if(actual !== datosGlobales.adminPass) {
                 alert('La contraseña actual es incorrecta.');
                 return;
             }
@@ -562,99 +397,76 @@
                 return;
             }
 
-            alert('Actualizando contraseña central en Google Sheets...');
             try {
-                let response = await fetch(WEB_APP_URL, {
+                let res = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'cambiarPassword', nuevaPassword: nueva })
                 });
-                let result = await response.json();
-
+                let result = await res.json();
                 if(result.result === 'success') {
-                    alert('¡Contraseña de administrador actualizada con éxito en la nube!');
-                    datosRemotosGlobal.adminPass = nueva;
+                    alert('¡Contraseña de administrador actualizada en la nube!');
+                    datosGlobales.adminPass = nueva;
                     document.getElementById('passActual').value = '';
                     document.getElementById('passNueva').value = '';
-                } else {
-                    alert('No se pudo actualizar la contraseña.');
                 }
             } catch(e) {
-                alert('Error de red al actualizar la contraseña.');
+                alert('Error de red al cambiar la contraseña.');
             }
         }
 
-        async function cargarAdminData() {
-            document.getElementById('configMensualidad').value = configLocal.mensualidad;
-            document.getElementById('configTasa').value = configLocal.tasa;
+        // --- ANIMACIÓN DE REDES EN EL FONDO ---
+        const canvas = document.getElementById('bg-network');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
 
-            const tbody = document.getElementById('adminTableBody');
-            tbody.innerHTML = `<tr><td colspan="8" class="loader">Sincronizando con Google Sheets...</td></tr>`;
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
 
-            await cargarDatosRemotos();
-            tbody.innerHTML = '';
-
-            if(datosRemotosGlobal.clientes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No hay clientes registrados.</td></tr>`;
-                return;
-            }
-
-            datosRemotosGlobal.clientes.forEach((c, index) => {
-                const abonoDls = c.abonoBs / configLocal.tasa;
-                let estatus = abonoDls >= configLocal.mensualidad ? 'Solvente' : (abonoDls > 0 ? 'Pendiente' : 'Moroso');
-                let badgeClass = estatus === 'Solvente' ? 'bg-solvente' : (estatus === 'Pendiente' ? 'bg-pendiente' : 'bg-moroso');
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${c.cedula}</td>
-                        <td>${c.nombres} ${c.apellidos}</td>
-                        <td>${c.telefono}</td>
-                        <td>${c.diaPago}</td>
-                        <td><input type="number" value="${c.abonoBs}" style="width:85px; padding:0.4rem;" id="abono_${index}"></td>
-                        <td>${c.factura}</td>
-                        <td><span class="badge ${badgeClass}">${estatus}</span></td>
-                        <td class="actions-cell">
-                            <button class="btn btn-success" onclick="actualizarAbonoNube('${c.cedula}', ${index})">OK</button>
-                        </td>
-                    </tr>
-                `;
+        const particles = [];
+        const numParticles = Math.floor(width / 35);
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                radius: Math.random() * 2 + 1
             });
         }
 
-        async function actualizarAbonoNube(cedula, index) {
-            const nuevoAbono = parseFloat(document.getElementById(`abono_${index}`).value) || 0;
-            alert('Actualizando abono en la nube...');
-            
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'actualizarAbono', cedula: cedula, abonoBs: nuevoAbono })
-                });
-                alert('¡Abono actualizado en Google Sheets!');
-                await cargarAdminData();
-            } catch(e) {
-                alert('Error al actualizar.');
+        function animateNetwork() {
+            ctx.clearRect(0, 0, width, height);
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(0, 255, 204, ${1 - dist / 120})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
             }
-        }
-
-        function guardarConfiguracionLocal() {
-            configLocal.mensualidad = parseFloat(document.getElementById('configMensualidad').value);
-            configLocal.tasa = parseFloat(document.getElementById('configTasa').value);
-            localStorage.setItem('cdi_config', JSON.stringify(configLocal));
-            alert('Parámetros guardados localmente.');
-            cargarAdminData();
-        }
-
-        function enviarReportePago() {
-            const monto = document.getElementById('pagoBs').value;
-            const ref = document.getElementById('pagoRef').value;
-            if(!monto || !ref) {
-                alert('Ingrese monto y referencia.');
-                return;
+            for (let p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#00ffcc';
+                ctx.fill();
             }
-            alert('¡Pago reportado con éxito! El operador lo validará.');
-            document.getElementById('pagoBs').value = '';
-            document.getElementById('pagoRef').value = '';
+            requestAnimationFrame(animateNetwork);
         }
+        animateNetwork();
     </script>
 </body>
 </html>
