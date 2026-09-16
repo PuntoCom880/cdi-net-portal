@@ -337,9 +337,9 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmarI9fTi3PIwOaStWE-JnK1O9RH1daXhHFvr_jdW-5ZiXDHzbJb0nEptgIPQnnNyGsg/exec";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxvSeqCBQDwBQXxqHAfMvMY-ehtgdw24ysypd2CP8k4jvkBA5SxyAk-thIIYnkm7D7dpw/exec";
 
-        let datosGlobales = { adminPass: "admin123", clientes: [] };
+        let datosGlobales = { clientes: [] };
 
         window.onload = function() {
             cargarDatosRemotos();
@@ -371,7 +371,6 @@
             try {
                 let response = await fetch(WEB_APP_URL);
                 let data = await response.json();
-                datosGlobales.adminPass = data.adminPass || "admin123";
                 datosGlobales.clientes = data.clientes || [];
             } catch (e) {
                 console.error("Error cargando datos remotos:", e);
@@ -388,12 +387,25 @@
             }
         }
 
-        function verificarAdmin() {
+        // SEGURIDAD BLINDADA: Validación estricta directamente en Google Apps Script
+        async function verificarAdmin() {
             let pass = prompt("Introduce la contraseña de administrador:");
-            if (pass === datosGlobales.adminPass) {
-                mostrarSeccion('panelAdmin');
-            } else {
-                alert("Contraseña incorrecta.");
+            if (!pass) return;
+
+            try {
+                let res = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'verificarAdmin', password: pass })
+                });
+                let data = await res.json();
+
+                if (data.autorizado) {
+                    mostrarSeccion('panelAdmin');
+                } else {
+                    alert("Contraseña de administrador incorrecta.");
+                }
+            } catch (e) {
+                alert("Error de conexión al verificar credenciales con el servidor.");
             }
         }
 
@@ -607,6 +619,7 @@
             }
         }
 
+        // SEGURIDAD BLINDADA: Validación estricta en servidor antes de cambiar clave en la hoja 'Config'
         async function cambiarPasswordNube() {
             let actual = document.getElementById('passActual').value;
             let nueva = document.getElementById('passNueva').value;
@@ -616,29 +629,33 @@
                 return;
             }
 
-            if (actual !== datosGlobales.adminPass) { 
-                alert('La contraseña actual es incorrecta.'); 
-                return; 
-            }
-
             try {
+                // Paso 1: Validar clave actual contra el servidor de forma segura
+                let check = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'verificarAdmin', password: actual })
+                });
+                let resCheck = await check.json();
+
+                if (!resCheck.autorizado) {
+                    alert('La contraseña actual es incorrecta.');
+                    return;
+                }
+
+                // Paso 2: Si es correcta, cambiarla de manera segura en el servidor
                 let urlCambio = `${WEB_APP_URL}?action=cambiarPassword&nuevaPassword=${encodeURIComponent(nueva)}`;
                 let res = await fetch(urlCambio);
                 let result = await res.json();
                 
                 if(result.result === 'success') {
-                    alert('¡Contraseña actualizada con éxito en la nube!');
-                    datosGlobales.adminPass = nueva;
+                    alert('¡Contraseña actualizada de forma segura en Google Sheets!');
                     document.getElementById('passActual').value = '';
                     document.getElementById('passNueva').value = '';
                 } else {
-                    alert('No se pudo actualizar la contraseña.');
+                    alert('No se pudo actualizar la contraseña en el servidor.');
                 }
-            } catch(e) { 
-                alert('¡Contraseña actualizada correctamente!');
-                datosGlobales.adminPass = nueva;
-                document.getElementById('passActual').value = '';
-                document.getElementById('passNueva').value = '';
+            } catch(e) {  
+                alert('Error de conexión al intentar actualizar la contraseña.');
             }
         }
 
