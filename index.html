@@ -27,7 +27,7 @@
         .container {
             position: relative;
             z-index: 1;
-            max-width: 1000px;
+            max-width: 800px;
             margin: 0 auto;
             background: rgba(15, 23, 42, 0.85);
             padding: 30px;
@@ -75,13 +75,14 @@
 
         input, select {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 8px 0 15px 0;
             background: #1e293b;
             border: 1px solid #334155;
             color: white;
-            border-radius: 4px;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 16px;
         }
 
         table {
@@ -109,8 +110,36 @@
             display: block;
         }
 
-        .search-box {
-            margin-bottom: 15px;
+        /* Estilo vertical estético para el perfil del cliente */
+        .card-cliente {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .info-value {
+            color: #ffffff;
+            font-weight: bold;
+            text-align: right;
         }
     </style>
 </head>
@@ -130,28 +159,18 @@
             <button onclick="verificarAdmin()">Panel Admin</button>
         </div>
 
-        <!-- SECCIÓN: PORTAL DEL CLIENTE -->
+        <!-- SECCIÓN: PORTAL DEL CLIENTE (Privado e Individual Vertical) -->
         <div id="portalCliente" class="section active-section">
-            <h2>Portal del Cliente</h2>
-            <p>Consulte el estado de su cuenta y día de pago en la red.</p>
-            <input type="text" id="buscadorCliente" placeholder="Buscar por cédula o nombre..." onkeyup="filtrarClientesPublico()">
-            <div style="overflow-x: auto;">
-                <table id="tablaClientesPublica">
-                    <thead>
-                        <tr>
-                            <th>Cédula</th>
-                            <th>Cliente</th>
-                            <th>Teléfono</th>
-                            <th>Día Pago</th>
-                            <th>Abono Bs</th>
-                            <th>Estatus</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyPublico">
-                        <!-- Cargado dinámicamente -->
-                    </tbody>
-                </table>
+            <h2>Portal de Consulta de Abonado</h2>
+            <p style="text-align: center;">Ingrese su número de cédula para consultar el estatus de su cuenta:</p>
+            
+            <div style="max-width: 400px; margin: 0 auto;">
+                <input type="text" id="buscadorCedula" placeholder="Ej. 25975209">
+                <button type="button" onclick="buscarClienteIndividual()" style="width: 100%;">Consultar Estatus</button>
             </div>
+
+            <!-- Contenedor donde se despliega la tarjeta vertical de resultados -->
+            <div id="resultadoCliente"></div>
         </div>
 
         <!-- SECCIÓN: REGISTRO NUEVO -->
@@ -196,7 +215,7 @@
 
             <!-- Base de Datos de Clientes con Buscador y Eliminación -->
             <h3>Base de Datos de Clientes (Google Sheets)</h3>
-            <div class="search-box">
+            <div style="margin-bottom: 15px;">
                 <input type="text" id="buscadorAdmin" placeholder="🔍 Motor de búsqueda de clientes (filtrar por cédula o nombre)..." onkeyup="filtrarClientesAdmin()">
             </div>
             
@@ -224,12 +243,10 @@
 
     <!-- Script principal de lógica y animación -->
     <script>
-        // URL de Google Apps Script integrada correctamente
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz47HbcisPjyr_hZQ9rNXlMEE9poLpFTq4Vl4R1MctdQGwLrJhnsg3VKB7b6scWFmcafA/exec";
 
         let datosGlobales = { adminPass: "admin123", clientes: [] };
 
-        // Cargar datos al iniciar
         window.onload = function() {
             cargarDatosRemotos();
         };
@@ -240,7 +257,6 @@
                 let data = await response.json();
                 datosGlobales.adminPass = data.adminPass || "admin123";
                 datosGlobales.clientes = data.clientes || [];
-                renderizarTablas();
             } catch (e) {
                 console.error("Error cargando datos remotos:", e);
             }
@@ -249,36 +265,74 @@
         function mostrarSeccion(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active-section'));
             document.getElementById(id).classList.add('active-section');
+            if(id === 'panelAdmin') {
+                renderizarTablaAdmin();
+            }
         }
 
         function verificarAdmin() {
             let pass = prompt("Introduce la contraseña de administrador:");
             if (pass === datosGlobales.adminPass) {
                 mostrarSeccion('panelAdmin');
-                renderizarTablas();
             } else {
                 alert("Contraseña incorrecta.");
             }
         }
 
-        function renderizarTablas() {
-            // Renderizar tabla pública
-            let tbodyPub = document.getElementById('tbodyPublico');
-            tbodyPub.innerHTML = '';
-            datosGlobales.clientes.forEach(c => {
-                tbodyPub.innerHTML += `
-                    <tr>
-                        <td>${c.cedula}</td>
-                        <td>${c.nombres} ${c.apellidos}</td>
-                        <td>${c.telefono}</td>
-                        <td>${c.diaPago}</td>
-                        <td>${c.abonoBs}</td>
-                        <td><span style="color: ${c.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b'}">${c.estatusPago}</span></td>
-                    </tr>
-                `;
-            });
+        // --- BÚSQUEDA INDIVIDUAL PARA EL CLIENTE (VERTICAL Y PRIVADA) ---
+        function buscarClienteIndividual() {
+            let cedulaInput = document.getElementById('buscadorCedula').value.trim();
+            let contenedor = document.getElementById('resultadoCliente');
 
-            // Renderizar tabla admin
+            if (!cedulaInput) {
+                alert("Por favor ingrese un número de cédula.");
+                contenedor.innerHTML = '';
+                return;
+            }
+
+            // Buscar en el arreglo global de clientes
+            let clienteEncontrado = datosGlobales.clientes.find(c => String(c.cedula).trim() === cedulaInput);
+
+            if (!clienteEncontrado) {
+                contenedor.innerHTML = `<p style="text-align: center; color: #ff6b6b; margin-top: 20px;">No se encontró ningún registro asociado a la cédula: <b>${cedulaInput}</b></p>`;
+                return;
+            }
+
+            let colorEstatus = clienteEncontrado.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b';
+
+            // Generar tarjeta vertical estética
+            contenedor.innerHTML = `
+                <div class="card-cliente">
+                    <h3 style="margin-top: 0; color: #00ffcc; text-align: center; border-bottom: 1px solid rgba(0,255,204,0.2); padding-bottom: 10px;">📋 Detalle de Cuenta</h3>
+                    <div class="info-row">
+                        <span class="info-label">Cédula:</span>
+                        <span class="info-value">${clienteEncontrado.cedula}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Cliente:</span>
+                        <span class="info-value">${clienteEncontrado.nombres} ${clienteEncontrado.apellidos}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">${clienteEncontrado.telefono}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Día de Pago:</span>
+                        <span class="info-value">${clienteEncontrado.diaPago}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Abono Bs:</span>
+                        <span class="info-value">${clienteEncontrado.abonoBs}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Estatus:</span>
+                        <span class="info-value" style="color: ${colorEstatus};">${clienteEncontrado.estatusPago}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderizarTablaAdmin() {
             let tbodyAdmin = document.getElementById('tbodyAdmin');
             tbodyAdmin.innerHTML = '';
             datosGlobales.clientes.forEach(c => {
@@ -288,7 +342,7 @@
                         <td>${c.nombres} ${c.apellidos}</td>
                         <td>${c.telefono}</td>
                         <td>${c.diaPago}</td>
-                        <td><input type="number" value="${c.abonoBs}" style="width:80px;" id="abono_${c.cedula}"></td>
+                        <td><input type="number" value="${c.abonoBs}" style="width:80px; margin:0;" id="abono_${c.cedula}"></td>
                         <td>${c.factura}</td>
                         <td><span style="color: ${c.estatusPago === 'Solvente' ? '#00ffcc' : '#ff6b6b'}">${c.estatusPago}</span></td>
                         <td>
@@ -297,16 +351,6 @@
                         </td>
                     </tr>
                 `;
-            });
-        }
-
-        // --- MOTOR DE BÚSQUEDA ---
-        function filtrarClientesPublico() {
-            let filtro = document.getElementById('buscadorCliente').value.toLowerCase();
-            let filas = document.querySelectorAll('#tbodyPublico tr');
-            filas.forEach(fila => {
-                let texto = fila.textContent.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? '' : 'none';
             });
         }
 
@@ -357,7 +401,8 @@
                 let result = await res.json();
                 if(result.result === 'success') {
                     alert('¡Abono actualizado con éxito!');
-                    cargarDatosRemotos();
+                    await cargarDatosRemotos();
+                    renderizarTablaAdmin();
                 }
             } catch(e) {
                 alert('Error de red al actualizar abono.');
@@ -375,7 +420,8 @@
                 let result = await res.json();
                 if(result.result === 'success') {
                     alert('¡Cliente eliminado de Google Sheets!');
-                    cargarDatosRemotos();
+                    await cargarDatosRemotos();
+                    renderizarTablaAdmin();
                 } else {
                     alert('No se pudo eliminar el cliente.');
                 }
